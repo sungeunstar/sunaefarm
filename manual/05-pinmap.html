@@ -33,9 +33,9 @@
   </div>
   <div class="manual-body">
 
-    <div class="callout callout-warn">
-      <div class="callout-title">현장 적용 버전으로 업데이트됨</div>
-      기존 28BYJ-48 스테퍼모터(D8~D11)와 12V 팬 구성에서 K-6060 DC 24V 모터 + WO-100D AC 220V 환풍기 구성으로 변경되었습니다.
+    <div class="callout callout-info">
+      <div class="callout-title">Arduino Mega 2560 기준 핀맵</div>
+      Arduino Uno는 디지털 핀이 부족해 전자밸브 3개 + SSR-2를 동시에 연결할 수 없습니다. Arduino Mega 2560을 사용하면 D22~D24 핀으로 전자밸브 3구역을 독립 제어할 수 있습니다. BH1750은 Mega의 하드웨어 I2C (D20/D21)를 사용합니다.
     </div>
 
     <h2>전체 핀 배정표</h2>
@@ -45,85 +45,83 @@
         <tr><td>A0</td><td>토양수분 센서 1 (민트)</td><td>INPUT 아날로그</td><td>0~5V</td><td>캐패시티브 v1.2</td></tr>
         <tr><td>A1</td><td>토양수분 센서 2 (레몬밤)</td><td>INPUT 아날로그</td><td>0~5V</td><td>캐패시티브 v1.2</td></tr>
         <tr><td>A2</td><td>토양수분 센서 3 (바질)</td><td>INPUT 아날로그</td><td>0~5V</td><td>캐패시티브 v1.2</td></tr>
-        <tr><td>A3</td><td>푸시버튼 1 (펌프 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
+        <tr><td>A3</td><td>푸시버튼 1 (관수 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
         <tr><td>A4</td><td>푸시버튼 2 (팬 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
         <tr><td>A5</td><td>푸시버튼 3 (측창 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
         <tr><td>D2</td><td>DHT22 DATA</td><td>INPUT</td><td>5V</td><td><strong>10kΩ 풀업저항 필수</strong></td></tr>
-        <tr><td>D3</td><td>BH1750 SDA</td><td>I/O 소프트 I2C</td><td>5V</td><td>SoftwareWire 라이브러리</td></tr>
-        <tr><td>D4</td><td>BH1750 SCL</td><td>I/O 소프트 I2C</td><td>5V</td><td>SoftwareWire 라이브러리</td></tr>
-        <tr style="background:#fff8e1"><td><strong>D5</strong></td><td><strong>펌프 릴레이 (24V 다이어프램)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>LOW = ON. 릴레이가 24V 회로 스위칭</td></tr>
-        <tr style="background:#fff8e1"><td><strong>D6</strong></td><td><strong>SSR 신호 (WO-100D 환풍기 220V)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>HIGH = ON. SSR이 220V AC 스위칭</td></tr>
-        <tr style="background:#e8f5e9"><td><strong>D7</strong></td><td><strong>DPDT 릴레이 A (모터 열기)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>측창 정회전(열기). D8과 동시 ON 절대 금지</td></tr>
-        <tr style="background:#e8f5e9"><td><strong>D8</strong></td><td><strong>DPDT 릴레이 B (모터 닫기)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>측창 역회전(닫기). D7과 동시 ON 절대 금지</td></tr>
+        <tr><td>D20 (SDA)</td><td>BH1750 SDA</td><td>I/O 하드웨어 I2C</td><td>5V</td><td>Wire 라이브러리. Mega 하드웨어 I2C</td></tr>
+        <tr><td>D21 (SCL)</td><td>BH1750 SCL</td><td>I/O 하드웨어 I2C</td><td>5V</td><td>Wire 라이브러리. Mega 하드웨어 I2C</td></tr>
+        <tr style="background:#fff8e1"><td><strong>D5</strong></td><td><strong>SSR-2 신호 (PW-350SMA 비상차단)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>HIGH=차단. 정상 동작 시 항상 OFF 유지</td></tr>
+        <tr style="background:#fff8e1"><td><strong>D6</strong></td><td><strong>SSR-1 신호 (WO-100D 환풍기 220V)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>HIGH=ON. SSR이 220V AC 스위칭</td></tr>
+        <tr style="background:#e8f5e9"><td><strong>D7</strong></td><td><strong>DPDT 릴레이 A (K-6060 열기)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>측창 정회전(열기). D8과 동시 ON 절대 금지</td></tr>
+        <tr style="background:#e8f5e9"><td><strong>D8</strong></td><td><strong>DPDT 릴레이 B (K-6060 닫기)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>측창 역회전(닫기). D7과 동시 ON 절대 금지</td></tr>
+        <tr><td>D9</td><td>LED 녹색 (AUTO 정상)</td><td>OUTPUT</td><td>5V</td><td>220Ω 저항 직렬 연결</td></tr>
         <tr style="background:#e3f2fd"><td><strong>D10</strong></td><td><strong>리밋 스위치 A (측창 열림 완료)</strong></td><td>INPUT_PULLUP</td><td>5V</td><td>LOW 신호 시 모터 정지</td></tr>
         <tr style="background:#e3f2fd"><td><strong>D11</strong></td><td><strong>리밋 스위치 B (측창 닫힘 완료)</strong></td><td>INPUT_PULLUP</td><td>5V</td><td>LOW 신호 시 모터 정지</td></tr>
-        <tr><td>D12</td><td>토글 스위치 (AUTO/MANUAL)</td><td>INPUT_PULLUP</td><td>5V</td><td>HIGH = AUTO, LOW = MANUAL</td></tr>
-        <tr><td>D9, D13</td><td>LED 상태 표시 (녹/황)</td><td>OUTPUT</td><td>5V</td><td>220Ω 저항 직렬 연결</td></tr>
+        <tr><td>D12</td><td>토글 스위치 (AUTO/MANUAL)</td><td>INPUT_PULLUP</td><td>5V</td><td>HIGH=AUTO, LOW=MANUAL</td></tr>
+        <tr><td>D13</td><td>LED 황색 (MANUAL/경고)</td><td>OUTPUT</td><td>5V</td><td>220Ω 저항 직렬 연결</td></tr>
+        <tr style="background:#fce4ec"><td><strong>D22</strong></td><td><strong>전자밸브 1 릴레이 (민트 구역)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>LOW=ON. 4채널 릴레이 모듈 경유 → 24V 전자밸브 스위칭</td></tr>
+        <tr style="background:#fce4ec"><td><strong>D23</strong></td><td><strong>전자밸브 2 릴레이 (레몬밤 구역)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>LOW=ON</td></tr>
+        <tr style="background:#fce4ec"><td><strong>D24</strong></td><td><strong>전자밸브 3 릴레이 (바질 구역)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>LOW=ON</td></tr>
       </tbody>
     </table>
 
     <h2>변경 요약</h2>
     <div class="two-col">
       <div>
-        <h3 style="color:#e63946">❌ 제거된 핀 연결</h3>
+        <h3 style="color:#e63946">❌ 제거된 구성</h3>
         <ul>
-          <li>D8~D11: ULN2003 IN1~4 (28BYJ-48 스테퍼)</li>
+          <li>28BYJ-48 스테퍼모터 + ULN2003 드라이버</li>
+          <li>12V DC 팬 + 12V 어댑터</li>
+          <li>24V 다이어프램 수중 펌프</li>
+          <li>D3/D4 소프트웨어 I2C</li>
         </ul>
       </div>
       <div>
-        <h3 style="color:#2d6a4f">✅ 새로운 핀 연결</h3>
+        <h3 style="color:#2d6a4f">✅ 현장 적용 구성</h3>
         <ul>
-          <li>D6: SSR 신호 → WO-100D 220V 환풍기</li>
-          <li>D7: DPDT 릴레이 A → K-6060 정회전(열기)</li>
-          <li>D8: DPDT 릴레이 B → K-6060 역회전(닫기)</li>
-          <li>D10: 리밋 스위치 A (열림 감지)</li>
-          <li>D11: 리밋 스위치 B (닫힘 감지)</li>
+          <li>K-6060 DC 24V 모터 + DPDT 릴레이 (D7/D8)</li>
+          <li>WO-100D AC 220V 환풍기 + SSR-1 (D6)</li>
+          <li>윌로 PW-350SMA + 전자밸브 × 3 (D22/D23/D24)</li>
+          <li>SSR-2 펌프 비상차단 (D5)</li>
+          <li>BH1750 하드웨어 I2C (D20/D21)</li>
+          <li>리밋 스위치 A/B (D10/D11)</li>
         </ul>
       </div>
     </div>
 
-    <h2>전자밸브 핀 배정 (선택)</h2>
-    <p>펌프 단독 대신 전자밸브 3개를 사용하는 경우 추가 릴레이 채널이 필요합니다.</p>
-    <table class="spec-table">
-      <thead><tr><th>핀</th><th>연결</th><th>비고</th></tr></thead>
-      <tbody>
-        <tr><td>D5</td><td>24V 펌프 릴레이</td><td>메인 펌프 ON/OFF</td></tr>
-        <tr><td>추가 릴레이 채널 1</td><td>전자밸브 1 (민트)</td><td>2nd 릴레이 모듈 필요</td></tr>
-        <tr><td>추가 릴레이 채널 2</td><td>전자밸브 2 (레몬밤)</td><td></td></tr>
-        <tr><td>추가 릴레이 채널 3</td><td>전자밸브 3 (바질)</td><td></td></tr>
-      </tbody>
-    </table>
-    <div class="callout callout-info">
-      <div class="callout-title">Arduino Uno 디지털 핀 여유 확인</div>
-      전자밸브 3개를 추가하면 디지털 핀이 부족할 수 있습니다. Arduino Mega 2560으로 업그레이드하거나, I2C 릴레이 익스팬더(PCF8574) 모듈을 사용하면 핀을 2개 추가 확장할 수 있습니다.
-    </div>
-
     <h2>핀 배정 코드 선언 예시</h2>
-    <pre class="code-block">// sunae_farm.ino — 핀 선언 (상단에 위치)
+    <pre class="code-block">// sunae_farm.ino — 핀 선언 (상단에 위치, Arduino Mega 2560 기준)
 
 // ── 센서 핀 ─────────────────────────────
 const int SOIL_PIN_1      = A0;  // 토양수분 민트
 const int SOIL_PIN_2      = A1;  // 토양수분 레몬밤
 const int SOIL_PIN_3      = A2;  // 토양수분 바질
-const int DHT22_PIN       = 2;   // DHT22 DATA
-const int BH1750_SDA      = 3;   // BH1750 소프트 I2C
-const int BH1750_SCL      = 4;   // BH1750 소프트 I2C
+const int DHT22_PIN       = 2;   // DHT22 DATA (10kΩ 풀업저항 필수)
+// BH1750: Wire 라이브러리 사용 (D20/D21 자동 할당)
 
 // ── 액추에이터 핀 ────────────────────────
-const int PUMP_RELAY      = 5;   // 24V 펌프 (LOW=ON)
-const int FAN_SSR         = 6;   // 220V 환풍기 SSR (HIGH=ON)
+const int PUMP_SSR2       = 5;   // 펌프 비상차단 SSR-2 (HIGH=차단)
+const int FAN_SSR         = 6;   // 환풍기 SSR-1 (HIGH=ON)
 const int MOTOR_OPEN      = 7;   // K-6060 정회전 (열기)
 const int MOTOR_CLOSE     = 8;   // K-6060 역회전 (닫기)
+const int VALVE_1         = 22;  // 전자밸브 민트 구역 (LOW=ON)
+const int VALVE_2         = 23;  // 전자밸브 레몬밤 구역
+const int VALVE_3         = 24;  // 전자밸브 바질 구역
 
 // ── 리밋 스위치 ──────────────────────────
-const int LIMIT_OPEN      = 10;  // 측창 열림 감지
-const int LIMIT_CLOSE     = 11;  // 측창 닫힘 감지
+const int LIMIT_OPEN      = 10;  // 측창 열림 완료 감지
+const int LIMIT_CLOSE     = 11;  // 측창 닫힘 완료 감지
 
 // ── 모드 스위칭 ──────────────────────────
 const int TOGGLE_AUTO     = 12;  // AUTO/MANUAL 토글
-const int BTN_PUMP        = A3;  // 수동 펌프
+const int BTN_VALVE       = A3;  // 수동 관수
 const int BTN_FAN         = A4;  // 수동 팬
-const int BTN_WINDOW      = A5;  // 수동 측창</pre>
+const int BTN_WINDOW      = A5;  // 수동 측창
+
+// ── 상태 표시 LED ─────────────────────────
+const int LED_GREEN       = 9;   // 녹색 (AUTO 정상)
+const int LED_YELLOW      = 13;  // 황색 (MANUAL/경고)</pre>
 
   </div>
   <div class="page-nav">

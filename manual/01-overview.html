@@ -53,9 +53,9 @@
     <table class="spec-table">
       <thead><tr><th>기능</th><th>동작 조건</th><th>담당 부품</th></tr></thead>
       <tbody>
-        <tr><td>자동 관수</td><td>토양수분 40% 이하 감지 시 펌프 5초 ON, 30분 대기</td><td>토양수분 센서 × 3, 수중 펌프, 릴레이</td></tr>
-        <tr><td>환풍 제어</td><td>온도 28°C 초과 또는 습도 80% 초과 시 팬 ON</td><td>DHT22, 환풍팬 × 2, 릴레이</td></tr>
-        <tr><td>측창 개폐</td><td>온도 30°C 초과 시 열기 / 25°C 이하 시 닫기</td><td>DHT22, 28BYJ-48 스테퍼모터, ULN2003</td></tr>
+        <tr><td>자동 관수</td><td>토양수분 40% 이하 감지 시 전자밸브 60초 ON, 30분 대기 (PW-350SMA 압력 스위치 자동 ON/OFF)</td><td>토양수분 센서 × 3, 전자밸브 × 3, 윌로 PW-350SMA</td></tr>
+        <tr><td>환풍 제어</td><td>온도 28°C 초과 또는 습도 80% 초과 시 팬 ON</td><td>DHT22, WO-100D 환풍기, SSR-1</td></tr>
+        <tr><td>측창 개폐</td><td>온도 30°C 초과 시 열기 / 25°C 이하 시 닫기</td><td>DHT22, K-6060 DC 24V 모터, DPDT 릴레이, 리밋 스위치</td></tr>
         <tr><td>긴급 알림</td><td>온도 35°C 초과 시 텔레그램 메시지 발송</td><td>라즈베리파이, 텔레그램 봇</td></tr>
         <tr><td>원격 제어</td><td>언제 어디서나 웹 대시보드로 수동 명령</td><td>라즈베리파이, Flask, ngrok</td></tr>
         <tr><td>현장 수동 제어</td><td>버튼으로 직접 제어 (WiFi 없어도 동작)</td><td>Arduino, 푸시버튼 × 3, 토글 스위치</td></tr>
@@ -89,11 +89,11 @@
         </ul>
       </div>
       <div>
-        <h3>근육 — Arduino Uno</h3>
+        <h3>근육 — Arduino Mega 2560</h3>
         <ul>
           <li>센서 직접 읽기 (아날로그·디지털)</li>
           <li>릴레이 ON/OFF 제어</li>
-          <li>스테퍼모터 제어 (측창)</li>
+          <li>DPDT 릴레이 제어 (K-6060 측창)</li>
           <li>물리 버튼 입력 처리</li>
           <li>WiFi 없어도 독립 동작 가능</li>
         </ul>
@@ -101,7 +101,7 @@
     </div>
 
     <h2>예상 총 비용</h2>
-    <p>전체 부품 구매 예산은 약 <strong>₩158,200 ~ ₩255,000</strong>입니다. 자세한 항목은 <a href="../shopping.html">구매 리스트</a>에서 확인할 수 있습니다.</p>
+    <p>전체 부품 구매 예산은 약 <strong>₩600,000 ~ ₩950,000</strong> (30평 하우스 + 점적관수 포함)입니다. 자세한 항목은 <a href="../shopping.html">구매 리스트</a>에서 확인할 수 있습니다.</p>
 
   </div>
 

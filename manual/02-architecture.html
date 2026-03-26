@@ -50,10 +50,10 @@
   ├─ 텔레그램 봇 (telegram_bot.py)
   └─ GitHub pull → 코드 배포
         ↓  USB 시리얼 통신 (9600bps)
-[ Arduino Uno ]  ← 근육
+[ Arduino Mega 2560 ]  ← 근육
   ├─ 센서 직접 읽기 (토양수분·온습도·조도)
-  ├─ 릴레이 제어 (펌프·팬)
-  ├─ 스테퍼모터 제어 (측창 개폐)
+  ├─ 릴레이 제어 (전자밸브 × 3·환풍기·SSR)
+  ├─ DPDT 릴레이 제어 (K-6060 측창 개폐)
   └─ 물리 버튼 입력 처리 (MANUAL 모드)</pre>
 
     <h2>왜 라즈베리파이 + Arduino 이중 구조인가</h2>
@@ -85,8 +85,14 @@ SOIL:45,62,38|TEMP:27.3|HUM:65.2|LUX:842|MODE:AUTO</pre>
 
     <h3>라즈베리파이 → Arduino (제어 명령 전송)</h3>
     <pre class="code-block"># 라즈베리파이가 보내는 명령 형식
-PUMP:ON      # 펌프 켜기
-PUMP:OFF     # 펌프 끄기
+VALVE:1:ON   # 민트 구역 전자밸브 열기
+VALVE:1:OFF  # 민트 구역 전자밸브 닫기
+VALVE:2:ON   # 레몬밤 구역 전자밸브
+VALVE:2:OFF
+VALVE:3:ON   # 바질 구역 전자밸브
+VALVE:3:OFF
+PUMP_STOP:ON  # 펌프 비상차단 SSR-2
+PUMP_STOP:OFF # 비상차단 해제
 FAN:ON       # 팬 켜기
 FAN:OFF      # 팬 끄기
 WINDOW:OPEN  # 측창 열기

@@ -31,7 +31,7 @@
 
   <div class="page-header">
     <h1>회로 설계</h1>
-    <p>Arduino Uno 핀맵 · 배선 가이드 · Wokwi 시뮬레이터</p>
+    <p>Arduino Mega 2560 핀맵 · 배선 가이드 · Wokwi 시뮬레이터</p>
   </div>
 
   <div class="circuit-grid">
@@ -69,7 +69,7 @@
   </div>
 
   <section class="pinmap-section">
-    <h2>핀맵 (Arduino Uno)</h2>
+    <h2>핀맵 (Arduino Mega 2560)</h2>
 
     <div class="pinmap-grid">
 
@@ -85,12 +85,16 @@
 
       <div class="pin-group">
         <h3 class="pin-group-title actuator">액추에이터</h3>
-        <div class="pin-row"><span class="pin-num">D5</span><span class="pin-name">릴레이 CH1</span><span class="pin-note">펌프</span></div>
-        <div class="pin-row"><span class="pin-num">D6</span><span class="pin-name">릴레이 CH2</span><span class="pin-note">환풍팬</span></div>
-        <div class="pin-row"><span class="pin-num">D8</span><span class="pin-name">ULN2003 IN1</span><span class="pin-note">측창 스테퍼</span></div>
-        <div class="pin-row"><span class="pin-num">D9</span><span class="pin-name">ULN2003 IN2</span><span class="pin-note">측창 스테퍼</span></div>
-        <div class="pin-row"><span class="pin-num">D10</span><span class="pin-name">ULN2003 IN3</span><span class="pin-note">측창 스테퍼</span></div>
-        <div class="pin-row"><span class="pin-num">D11</span><span class="pin-name">ULN2003 IN4</span><span class="pin-note">측창 스테퍼</span></div>
+        <div class="pin-row"><span class="pin-num">D5</span><span class="pin-name">SSR-2 신호</span><span class="pin-note">펌프 비상차단</span></div>
+        <div class="pin-row"><span class="pin-num">D6</span><span class="pin-name">SSR-1 신호</span><span class="pin-note">WO-100D 환풍기</span></div>
+        <div class="pin-row"><span class="pin-num">D7</span><span class="pin-name">DPDT 릴레이 A</span><span class="pin-note warn">K-6060 열기</span></div>
+        <div class="pin-row"><span class="pin-num">D8</span><span class="pin-name">DPDT 릴레이 B</span><span class="pin-note warn">K-6060 닫기</span></div>
+        <div class="pin-row"><span class="pin-num">D9</span><span class="pin-name">LED 녹색</span><span class="pin-note">220Ω 직렬</span></div>
+        <div class="pin-row"><span class="pin-num">D10</span><span class="pin-name">리밋 스위치 A</span><span class="pin-note">측창 열림 감지</span></div>
+        <div class="pin-row"><span class="pin-num">D11</span><span class="pin-name">리밋 스위치 B</span><span class="pin-note">측창 닫힘 감지</span></div>
+        <div class="pin-row"><span class="pin-num">D22</span><span class="pin-name">전자밸브 1</span><span class="pin-note">민트 구역</span></div>
+        <div class="pin-row"><span class="pin-num">D23</span><span class="pin-name">전자밸브 2</span><span class="pin-note">레몬밤 구역</span></div>
+        <div class="pin-row"><span class="pin-num">D24</span><span class="pin-name">전자밸브 3</span><span class="pin-note">바질 구역</span></div>
       </div>
 
       <div class="pin-group">
@@ -108,9 +112,9 @@
     <h2>배선 주의사항</h2>
     <div class="warning-list">
       <div class="warning-item">⚠️ DHT22: DATA 핀과 VCC 사이에 반드시 10kΩ 풀업저항 연결</div>
-      <div class="warning-item">⚠️ 릴레이 CH2 (팬): 12V 외부 전원 별도 연결 필요</div>
+      <div class="warning-item">⚠️ SSR-1/SSR-2: 방열판 필수. 없으면 수분 내 과열 손상</div>
       <div class="warning-item">⚠️ 관수 중 측창 열기 금지 — 물 튀김 사고 방지</div>
-      <div class="warning-item">⚠️ 스테퍼모터: 반드시 ULN2003 드라이버 경유. Arduino 직결 금지</div>
+      <div class="warning-item">⚠️ DPDT 릴레이 D7/D8: 동시 ON 절대 금지 — 24V 쇼트. 50ms 딜레이 필수</div>
       <div class="warning-item">⚠️ 모든 GND는 공통 접지 (Arduino GND)</div>
     </div>
   </section>
