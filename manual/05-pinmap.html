@@ -29,91 +29,101 @@
   <div class="manual-header">
     <div class="label">05 / 11</div>
     <h1>핀맵</h1>
-    <p class="desc">Arduino Uno 전체 핀 배정, 배선 원칙, 주의사항</p>
+    <p class="desc">Arduino Uno 전체 핀 배정 — 현장 적용 버전 (K-6060 / WO-100D 기준)</p>
   </div>
   <div class="manual-body">
 
+    <div class="callout callout-warn">
+      <div class="callout-title">현장 적용 버전으로 업데이트됨</div>
+      기존 28BYJ-48 스테퍼모터(D8~D11)와 12V 팬 구성에서 K-6060 DC 24V 모터 + WO-100D AC 220V 환풍기 구성으로 변경되었습니다.
+    </div>
+
     <h2>전체 핀 배정표</h2>
     <table class="spec-table">
-      <thead><tr><th>핀</th><th>연결 부품</th><th>방향</th><th>주의사항</th></tr></thead>
+      <thead><tr><th>핀</th><th>연결 부품</th><th>방향</th><th>전압 레벨</th><th>비고</th></tr></thead>
       <tbody>
-        <tr><td>A0</td><td>토양수분 센서 1 (민트)</td><td>INPUT (아날로그)</td><td>캐패시티브 v1.2만 사용</td></tr>
-        <tr><td>A1</td><td>토양수분 센서 2 (레몬밤)</td><td>INPUT (아날로그)</td><td>캐패시티브 v1.2만 사용</td></tr>
-        <tr><td>A2</td><td>토양수분 센서 3 (바질)</td><td>INPUT (아날로그)</td><td>캐패시티브 v1.2만 사용</td></tr>
-        <tr><td>A3</td><td>푸시버튼 1 (펌프 수동)</td><td>INPUT_PULLUP</td><td>GND로 연결, 내부 풀업 사용</td></tr>
-        <tr><td>A4</td><td>푸시버튼 2 (팬 수동)</td><td>INPUT_PULLUP</td><td>GND로 연결, 내부 풀업 사용</td></tr>
-        <tr><td>A5</td><td>푸시버튼 3 (측창 수동)</td><td>INPUT_PULLUP</td><td>GND로 연결, 내부 풀업 사용</td></tr>
-        <tr><td>D2</td><td>DHT22 DATA</td><td>INPUT</td><td><strong>10kΩ 풀업저항 필수</strong> (DATA-VCC 사이)</td></tr>
-        <tr><td>D3</td><td>BH1750 SDA</td><td>I/O (소프트 I2C)</td><td>SoftwareWire 라이브러리 사용</td></tr>
-        <tr><td>D4</td><td>BH1750 SCL</td><td>I/O (소프트 I2C)</td><td>SoftwareWire 라이브러리 사용</td></tr>
-        <tr><td>D5</td><td>릴레이 CH1 (펌프)</td><td>OUTPUT</td><td>LOW = ON (릴레이 모듈 특성)</td></tr>
-        <tr><td>D6</td><td>릴레이 CH2 (환풍팬)</td><td>OUTPUT</td><td>LOW = ON (릴레이 모듈 특성)</td></tr>
-        <tr><td>D8</td><td>ULN2003 IN1 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
-        <tr><td>D9</td><td>ULN2003 IN2 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
-        <tr><td>D10</td><td>ULN2003 IN3 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
-        <tr><td>D11</td><td>ULN2003 IN4 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
-        <tr><td>D12</td><td>토글 스위치 (AUTO/MANUAL)</td><td>INPUT_PULLUP</td><td>HIGH = AUTO, LOW = MANUAL</td></tr>
+        <tr><td>A0</td><td>토양수분 센서 1 (민트)</td><td>INPUT 아날로그</td><td>0~5V</td><td>캐패시티브 v1.2</td></tr>
+        <tr><td>A1</td><td>토양수분 센서 2 (레몬밤)</td><td>INPUT 아날로그</td><td>0~5V</td><td>캐패시티브 v1.2</td></tr>
+        <tr><td>A2</td><td>토양수분 센서 3 (바질)</td><td>INPUT 아날로그</td><td>0~5V</td><td>캐패시티브 v1.2</td></tr>
+        <tr><td>A3</td><td>푸시버튼 1 (펌프 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
+        <tr><td>A4</td><td>푸시버튼 2 (팬 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
+        <tr><td>A5</td><td>푸시버튼 3 (측창 수동)</td><td>INPUT_PULLUP</td><td>5V</td><td>GND 연결, 내부 풀업</td></tr>
+        <tr><td>D2</td><td>DHT22 DATA</td><td>INPUT</td><td>5V</td><td><strong>10kΩ 풀업저항 필수</strong></td></tr>
+        <tr><td>D3</td><td>BH1750 SDA</td><td>I/O 소프트 I2C</td><td>5V</td><td>SoftwareWire 라이브러리</td></tr>
+        <tr><td>D4</td><td>BH1750 SCL</td><td>I/O 소프트 I2C</td><td>5V</td><td>SoftwareWire 라이브러리</td></tr>
+        <tr style="background:#fff8e1"><td><strong>D5</strong></td><td><strong>펌프 릴레이 (24V 다이어프램)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>LOW = ON. 릴레이가 24V 회로 스위칭</td></tr>
+        <tr style="background:#fff8e1"><td><strong>D6</strong></td><td><strong>SSR 신호 (WO-100D 환풍기 220V)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>HIGH = ON. SSR이 220V AC 스위칭</td></tr>
+        <tr style="background:#e8f5e9"><td><strong>D7</strong></td><td><strong>DPDT 릴레이 A (모터 열기)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>측창 정회전(열기). D8과 동시 ON 절대 금지</td></tr>
+        <tr style="background:#e8f5e9"><td><strong>D8</strong></td><td><strong>DPDT 릴레이 B (모터 닫기)</strong></td><td>OUTPUT</td><td>5V 신호</td><td>측창 역회전(닫기). D7과 동시 ON 절대 금지</td></tr>
+        <tr style="background:#e3f2fd"><td><strong>D10</strong></td><td><strong>리밋 스위치 A (측창 열림 완료)</strong></td><td>INPUT_PULLUP</td><td>5V</td><td>LOW 신호 시 모터 정지</td></tr>
+        <tr style="background:#e3f2fd"><td><strong>D11</strong></td><td><strong>리밋 스위치 B (측창 닫힘 완료)</strong></td><td>INPUT_PULLUP</td><td>5V</td><td>LOW 신호 시 모터 정지</td></tr>
+        <tr><td>D12</td><td>토글 스위치 (AUTO/MANUAL)</td><td>INPUT_PULLUP</td><td>5V</td><td>HIGH = AUTO, LOW = MANUAL</td></tr>
+        <tr><td>D9, D13</td><td>LED 상태 표시 (녹/황)</td><td>OUTPUT</td><td>5V</td><td>220Ω 저항 직렬 연결</td></tr>
       </tbody>
     </table>
 
-    <h2>전원 핀</h2>
+    <h2>변경 요약</h2>
+    <div class="two-col">
+      <div>
+        <h3 style="color:#e63946">❌ 제거된 핀 연결</h3>
+        <ul>
+          <li>D8~D11: ULN2003 IN1~4 (28BYJ-48 스테퍼)</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#2d6a4f">✅ 새로운 핀 연결</h3>
+        <ul>
+          <li>D6: SSR 신호 → WO-100D 220V 환풍기</li>
+          <li>D7: DPDT 릴레이 A → K-6060 정회전(열기)</li>
+          <li>D8: DPDT 릴레이 B → K-6060 역회전(닫기)</li>
+          <li>D10: 리밋 스위치 A (열림 감지)</li>
+          <li>D11: 리밋 스위치 B (닫힘 감지)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>전자밸브 핀 배정 (선택)</h2>
+    <p>펌프 단독 대신 전자밸브 3개를 사용하는 경우 추가 릴레이 채널이 필요합니다.</p>
     <table class="spec-table">
-      <thead><tr><th>핀</th><th>용도</th><th>최대 전류</th></tr></thead>
+      <thead><tr><th>핀</th><th>연결</th><th>비고</th></tr></thead>
       <tbody>
-        <tr><td>5V</td><td>DHT22, BH1750, 토양수분 센서, 릴레이 VCC, ULN2003 COM</td><td>500mA (USB 공급 시)</td></tr>
-        <tr><td>3.3V</td><td>사용 안 함</td><td>—</td></tr>
-        <tr><td>GND</td><td>모든 부품 공통 접지</td><td>—</td></tr>
+        <tr><td>D5</td><td>24V 펌프 릴레이</td><td>메인 펌프 ON/OFF</td></tr>
+        <tr><td>추가 릴레이 채널 1</td><td>전자밸브 1 (민트)</td><td>2nd 릴레이 모듈 필요</td></tr>
+        <tr><td>추가 릴레이 채널 2</td><td>전자밸브 2 (레몬밤)</td><td></td></tr>
+        <tr><td>추가 릴레이 채널 3</td><td>전자밸브 3 (바질)</td><td></td></tr>
       </tbody>
     </table>
-
-    <div class="callout callout-warn">
-      <div class="callout-title">5V 핀 전류 주의</div>
-      Arduino Uno의 5V 핀은 USB 공급 시 약 500mA까지만 안전하게 사용할 수 있습니다. 환풍팬(12V DC)은 반드시 외부 12V 어댑터로 별도 공급해야 합니다. 팬을 5V Arduino 핀으로 구동하면 Arduino가 리셋되거나 손상됩니다.
-    </div>
-
-    <h2>DHT22 배선 상세</h2>
-    <pre class="code-block">DHT22 핀 1 (VCC)  ──────────────── Arduino 5V
-DHT22 핀 2 (DATA) ──┬─────────── Arduino D2
-                    └── 10kΩ ── Arduino 5V  ← 풀업저항
-DHT22 핀 3 (NC)   ── (연결 안 함)
-DHT22 핀 4 (GND)  ──────────────── Arduino GND</pre>
-
-    <div class="callout callout-danger">
-      <div class="callout-title">10kΩ 풀업저항 없으면 DHT22가 동작하지 않습니다</div>
-      DATA 핀과 VCC 사이에 10kΩ 저항을 반드시 연결해야 합니다. 없으면 센서 값이 -1 또는 NaN으로 읽힙니다.
-    </div>
-
-    <h2>릴레이 모듈 배선 상세</h2>
-    <pre class="code-block">릴레이 모듈 VCC ──── Arduino 5V
-릴레이 모듈 GND ──── Arduino GND
-릴레이 CH1 IN  ──── Arduino D5  (LOW = 펌프 ON)
-릴레이 CH2 IN  ──── Arduino D6  (LOW = 팬 ON)
-
-릴레이 CH1 COM ──── 펌프 전원 +
-릴레이 CH1 NO  ──── 펌프 +극   (Normally Open)
-
-릴레이 CH2 COM ──── 12V 어댑터 +
-릴레이 CH2 NO  ──── 팬 +극     (Normally Open)</pre>
-
     <div class="callout callout-info">
-      <div class="callout-title">릴레이는 LOW 신호로 켜집니다</div>
-      일반적인 5V 릴레이 모듈은 IN 핀에 LOW(0V) 신호가 오면 릴레이가 ON됩니다. Arduino 코드에서 <code>digitalWrite(RELAY_PIN, LOW)</code> = 켜기, <code>HIGH</code> = 끄기임을 주의하세요.
+      <div class="callout-title">Arduino Uno 디지털 핀 여유 확인</div>
+      전자밸브 3개를 추가하면 디지털 핀이 부족할 수 있습니다. Arduino Mega 2560으로 업그레이드하거나, I2C 릴레이 익스팬더(PCF8574) 모듈을 사용하면 핀을 2개 추가 확장할 수 있습니다.
     </div>
 
-    <h2>ULN2003 + 28BYJ-48 배선</h2>
-    <pre class="code-block">ULN2003 IN1 ──── Arduino D8
-ULN2003 IN2 ──── Arduino D9
-ULN2003 IN3 ──── Arduino D10
-ULN2003 IN4 ──── Arduino D11
-ULN2003 COM ──── Arduino 5V
-ULN2003 OUT1~4 ─ 28BYJ-48 커넥터 (세트 구매 시 자동 연결)</pre>
+    <h2>핀 배정 코드 선언 예시</h2>
+    <pre class="code-block">// sunae_farm.ino — 핀 선언 (상단에 위치)
 
-    <div class="callout callout-warn">
-      <div class="callout-title">스테퍼모터 Arduino 직결 금지</div>
-      28BYJ-48 스테퍼모터를 Arduino 핀에 직접 연결하면 Arduino가 손상됩니다. 반드시 ULN2003 드라이버 보드를 경유해야 합니다.
-    </div>
+// ── 센서 핀 ─────────────────────────────
+const int SOIL_PIN_1      = A0;  // 토양수분 민트
+const int SOIL_PIN_2      = A1;  // 토양수분 레몬밤
+const int SOIL_PIN_3      = A2;  // 토양수분 바질
+const int DHT22_PIN       = 2;   // DHT22 DATA
+const int BH1750_SDA      = 3;   // BH1750 소프트 I2C
+const int BH1750_SCL      = 4;   // BH1750 소프트 I2C
 
-    <p>시각적 회로도는 <a href="../circuit.html">회로 설계</a> 페이지에서 Wokwi로 확인할 수 있습니다.</p>
+// ── 액추에이터 핀 ────────────────────────
+const int PUMP_RELAY      = 5;   // 24V 펌프 (LOW=ON)
+const int FAN_SSR         = 6;   // 220V 환풍기 SSR (HIGH=ON)
+const int MOTOR_OPEN      = 7;   // K-6060 정회전 (열기)
+const int MOTOR_CLOSE     = 8;   // K-6060 역회전 (닫기)
+
+// ── 리밋 스위치 ──────────────────────────
+const int LIMIT_OPEN      = 10;  // 측창 열림 감지
+const int LIMIT_CLOSE     = 11;  // 측창 닫힘 감지
+
+// ── 모드 스위칭 ──────────────────────────
+const int TOGGLE_AUTO     = 12;  // AUTO/MANUAL 토글
+const int BTN_PUMP        = A3;  // 수동 펌프
+const int BTN_FAN         = A4;  // 수동 팬
+const int BTN_WINDOW      = A5;  // 수동 측창</pre>
 
   </div>
   <div class="page-nav">

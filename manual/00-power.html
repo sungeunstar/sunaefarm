@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전력 시스템 설계 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">00. 전력 시스템 설계</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">00 / 11</div>
+    <h1>전력 시스템 설계</h1>
+    <p class="desc">AC 220V · DC 24V · DC 5V 전력 분배 구조 및 실제 하우스 장비 연동</p>
+  </div>
+  <div class="manual-body">
+
+    <div class="callout callout-danger">
+      <div class="callout-title">⚡ 220V 전기 작업 안전 경고</div>
+      AC 220V는 감전 시 사망에 이를 수 있습니다. 220V 관련 배선 작업은 반드시 <strong>차단기를 내린 후</strong> 진행하고, 전기 작업 경험이 없다면 릴레이(SSR) 이후의 220V 배선은 전기 기술자에게 의뢰하세요.
+    </div>
+
+    <h2>전체 전력 구조</h2>
+    <pre class="code-block">[ 한전 220V AC — 하우스 분전반 ]
+        │
+        ├─ 누전차단기(ELCB 20A) ─────────────────────────┐
+        │                                                  │
+        │  ┌─────────────────────────────────────────┐   │
+        │  │  SMPS 24V 10A                            │   │
+        │  │  (220V AC → 24V DC 변환)                 │   │
+        │  │   ├─ K-6060 측창 모터 (DC 24V 3.5A)      │   │
+        │  │   ├─ 24V 다이어프램 펌프 / 전자밸브 × 3   │   │
+        │  │   └─ DC-DC 벅컨버터 24V→5V               │   │
+        │  │         ├─ Arduino Uno                    │   │
+        │  │         └─ 센서류 (DHT22, BH1750, 토양)   │   │
+        │  └─────────────────────────────────────────┘   │
+        │                                                  │
+        │  ┌─────────────────────────────────────────┐   │
+        │  │  SSR 40A (DC 신호 → AC 220V 스위칭)      │   │
+        │  │   └─ WO-100D 환풍기 (AC 220V 0.18A)      │   │
+        │  └─────────────────────────────────────────┘   │
+        │                                                  │
+        └──────────────────────────────────────────────── ┘
+
+[ 라즈베리파이 4B ]
+  └─ 별도 5V 3A 어댑터 (전용 전원, SMPS와 분리)</pre>
+
+    <h2>전압별 역할 정리</h2>
+    <table class="spec-table">
+      <thead><tr><th>전압</th><th>공급 장치</th><th>연결 장비</th><th>최대 전류</th></tr></thead>
+      <tbody>
+        <tr><td><strong>220V AC</strong></td><td>한전 직접</td><td>SMPS 입력, SSR → 환풍기</td><td>차단기 20A</td></tr>
+        <tr><td><strong>24V DC</strong></td><td>SMPS 24V 10A</td><td>K-6060 모터, 펌프, 전자밸브 × 3</td><td>10A (240W)</td></tr>
+        <tr><td><strong>5V DC</strong></td><td>DC-DC 벅컨버터 or 어댑터</td><td>Arduino, 센서, 릴레이 신호</td><td>3A</td></tr>
+        <tr><td><strong>5V DC (독립)</strong></td><td>라즈베리파이 전용 어댑터</td><td>라즈베리파이 4B</td><td>3A</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <div class="callout-title">라즈베리파이는 전용 전원을 씁니다</div>
+      라즈베리파이는 반드시 별도 5V 3A 전용 어댑터로 공급해야 합니다. SMPS의 24V를 DC-DC 변환해서 쓰면 노이즈로 인해 SD카드 파일시스템이 손상될 수 있습니다.
+    </div>
+
+    <h2>실제 하우스 장비 스펙</h2>
+    <table class="spec-table">
+      <thead><tr><th>장비</th><th>모델</th><th>전압</th><th>전류</th><th>제어 방법</th></tr></thead>
+      <tbody>
+        <tr><td>측창 모터</td><td>K-6060</td><td>DC 24V</td><td>3.5A (84W)</td><td>DPDT 릴레이 (정/역회전)</td></tr>
+        <tr><td>환풍기</td><td>WO-100D</td><td>AC 220V</td><td>0.18A (40W)</td><td>SSR 40A (DC 신호로 AC 스위칭)</td></tr>
+        <tr><td>관수 펌프</td><td>24V 다이어프램</td><td>DC 24V</td><td>~2~5A</td><td>릴레이 ON/OFF</td></tr>
+        <tr><td>전자밸브</td><td>24V 솔레노이드</td><td>DC 24V</td><td>~0.5A</td><td>릴레이 ON/OFF</td></tr>
+      </tbody>
+    </table>
+
+    <h2>SMPS 용량 계산</h2>
+    <p>24V SMPS에 연결되는 장비의 최대 동시 소비 전류를 계산합니다.</p>
+    <table class="spec-table">
+      <thead><tr><th>장비</th><th>전류</th><th>동시 동작?</th></tr></thead>
+      <tbody>
+        <tr><td>K-6060 모터</td><td>3.5A</td><td>단독 동작</td></tr>
+        <tr><td>24V 펌프</td><td>~3A</td><td>모터와 동시 금지</td></tr>
+        <tr><td>전자밸브 × 3 (동시)</td><td>1.5A</td><td>펌프와 동시</td></tr>
+        <tr><td>기타 (릴레이 코일 등)</td><td>~0.5A</td><td>항시</td></tr>
+        <tr><td colspan="2"><strong>최대 동시 합산</strong></td><td><strong>~5A</strong></td></tr>
+      </tbody>
+    </table>
+    <p>최대 5A이지만 <strong>10A SMPS</strong>를 사용합니다. 안전 마진 2배 확보 + 향후 장비 추가 여유분.</p>
+
+    <h2>K-6060 모터 정/역회전 제어 (DPDT)</h2>
+    <p>측창은 열고(정회전) 닫을(역회전) 수 있어야 합니다. 릴레이 2개로 H-브릿지를 구성해 방향을 전환합니다.</p>
+    <pre class="code-block">상태             릴레이A    릴레이B    모터 동작
+────────────────────────────────────────────
+정지             OFF        OFF        정지
+열기 (정회전)    ON         OFF        24V+ → M+ → M- → GND
+닫기 (역회전)    OFF        ON         24V+ → M- → M+ → GND
+⚠️ 동시 ON 금지  ON         ON         쇼트! 절대 금지</pre>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">릴레이 A와 B를 동시에 ON하면 쇼트 발생</div>
+      코드에서 반드시 한쪽을 OFF 확인 후 다른 쪽을 ON하세요. 딜레이 50ms 이상 두는 것을 권장합니다.
+    </div>
+
+    <h2>SSR (Solid State Relay) 동작 원리</h2>
+    <p>SSR은 Arduino의 약한 DC 신호(5V)로 220V AC를 스위칭합니다. 기계식 릴레이와 달리 소음이 없고 수명이 깁니다.</p>
+    <pre class="code-block">Arduino D6 (5V 신호) ──── SSR INPUT+
+Arduino GND          ──── SSR INPUT-
+                          SSR OUTPUT ──── 220V AC 환풍기</pre>
+    <div class="callout callout-warn">
+      <div class="callout-title">SSR 방열판 필수</div>
+      SSR 40A는 연속 동작 시 발열이 심합니다. 방열판 없이 사용하면 수 분 내에 과열 손상됩니다. 알루미늄 방열판을 SSR 뒷면에 부착하고 써멀패드 또는 써멀구리스를 사용하세요.
+    </div>
+
+    <h2>리밋 스위치 역할</h2>
+    <p>K-6060 모터는 측창이 완전히 열리거나 닫혔을 때 스스로 멈추지 않습니다. 리밋 스위치가 없으면 모터가 물리적 한계를 넘어 무리하게 돌면서 기어 손상이 발생합니다.</p>
+    <table class="spec-table">
+      <thead><tr><th>스위치</th><th>핀</th><th>동작</th></tr></thead>
+      <tbody>
+        <tr><td>리밋 스위치 A (열림)</td><td>D10</td><td>측창 완전 열림 감지 → 모터 정지</td></tr>
+        <tr><td>리밋 스위치 B (닫힘)</td><td>D11</td><td>측창 완전 닫힘 감지 → 모터 정지</td></tr>
+      </tbody>
+    </table>
+
+    <h2>제어반(컨트롤 박스) 구성</h2>
+    <p>모든 고전압·고전류 부품은 IP65 방수 제어반에 수납합니다.</p>
+    <pre class="code-block">┌─────────────────────────────────────────┐
+│  IP65 방수 제어반 300×250mm             │
+│                                          │
+│  [누전차단기]  [SMPS 24V 10A]            │
+│                                          │
+│  [DIN 레일]                              │
+│  ├─ [SSR 40A + 방열판]                   │
+│  ├─ [DPDT 릴레이 모듈]                   │
+│  ├─ [4채널 릴레이 모듈]                  │
+│  └─ [단자대]                             │
+│                                          │
+│  [Arduino Uno]  (제어반 내부 또는 측면)  │
+│                                          │
+│  외부 노출: 토글스위치, 버튼, LED        │
+└─────────────────────────────────────────┘</pre>
+
+  </div>
+  <div class="page-nav">
+    <span></span>
+    <a href="01-overview.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">01. 프로젝트 개요</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>
