@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "author": "SUNAE FARM — FARMOB v1",
+  "editor": "wokwi",
+  "parts": [
+
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 220, "left": 320, "attrs": {} },
+
+    { "type": "wokwi-dht22",      "id": "dht22",  "top": 20,  "left": 60,  "attrs": {} },
+    { "type": "wokwi-resistor",   "id": "r_dht",  "top": 80,  "left": 60,  "attrs": { "value": "10000" } },
+
+    { "type": "wokwi-potentiometer", "id": "soil1", "top": 20,  "left": 240, "attrs": { "label": "토양수분_민트(A0)" } },
+    { "type": "wokwi-potentiometer", "id": "soil2", "top": 20,  "left": 380, "attrs": { "label": "토양수분_레몬밤(A1)" } },
+    { "type": "wokwi-potentiometer", "id": "soil3", "top": 20,  "left": 520, "attrs": { "label": "토양수분_바질(A2)" } },
+
+    { "type": "wokwi-relay",      "id": "relay1", "top": 20,  "left": 660, "attrs": { "label": "릴레이CH1_펌프" } },
+    { "type": "wokwi-relay",      "id": "relay2", "top": 120, "left": 660, "attrs": { "label": "릴레이CH2_팬" } },
+
+    { "type": "wokwi-uln2003a",     "id": "uln2003",  "top": 20,  "left": 820, "attrs": {} },
+    { "type": "wokwi-stepper-motor","id": "stepper",  "top": 20,  "left": 980, "attrs": { "display": "28byj48", "label": "측창_스테퍼모터" } },
+
+    { "type": "wokwi-slide-switch", "id": "sw_auto",  "top": 480, "left": 60,  "attrs": { "label": "AUTO/MANUAL_토글" } },
+
+    { "type": "wokwi-pushbutton",   "id": "btn1",     "top": 480, "left": 200, "attrs": { "label": "수동_펌프" } },
+    { "type": "wokwi-pushbutton",   "id": "btn2",     "top": 480, "left": 300, "attrs": { "label": "수동_팬" } },
+    { "type": "wokwi-pushbutton",   "id": "btn3",     "top": 480, "left": 400, "attrs": { "label": "수동_측창" } },
+
+    { "type": "wokwi-led",      "id": "led_r", "top": 480, "left": 560, "attrs": { "color": "red",    "label": "MANUAL모드" } },
+    { "type": "wokwi-led",      "id": "led_g", "top": 480, "left": 620, "attrs": { "color": "green",  "label": "AUTO모드" } },
+    { "type": "wokwi-led",      "id": "led_y", "top": 480, "left": 680, "attrs": { "color": "yellow", "label": "REMOTE모드" } },
+    { "type": "wokwi-resistor", "id": "r_r",   "top": 530, "left": 556, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r_g",   "top": 530, "left": 616, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r_y",   "top": 530, "left": 676, "attrs": { "value": "220" } }
+
+  ],
+  "connections": [
+
+    ["dht22:VCC", "uno:5V",    "red",   []],
+    ["dht22:GND", "uno:GND.1", "black", []],
+    ["dht22:SDA", "uno:D2",    "green", []],
+    ["dht22:SDA", "r_dht:1",   "green", []],
+    ["r_dht:2",   "uno:5V",    "red",   []],
+
+    ["soil1:VCC", "uno:5V",    "red",    []],
+    ["soil1:GND", "uno:GND.1", "black",  []],
+    ["soil1:SIG", "uno:A0",    "yellow", []],
+
+    ["soil2:VCC", "uno:5V",    "red",    []],
+    ["soil2:GND", "uno:GND.1", "black",  []],
+    ["soil2:SIG", "uno:A1",    "yellow", []],
+
+    ["soil3:VCC", "uno:5V",    "red",    []],
+    ["soil3:GND", "uno:GND.1", "black",  []],
+    ["soil3:SIG", "uno:A2",    "yellow", []],
+
+    ["relay1:IN",  "uno:D5",    "blue",  []],
+    ["relay1:VCC", "uno:5V",    "red",   []],
+    ["relay1:GND", "uno:GND.1", "black", []],
+
+    ["relay2:IN",  "uno:D6",    "blue",  []],
+    ["relay2:VCC", "uno:5V",    "red",   []],
+    ["relay2:GND", "uno:GND.1", "black", []],
+
+    ["uln2003:IN1", "uno:D8",    "blue",   []],
+    ["uln2003:IN2", "uno:D9",    "blue",   []],
+    ["uln2003:IN3", "uno:D10",   "blue",   []],
+    ["uln2003:IN4", "uno:D11",   "blue",   []],
+    ["uln2003:COM", "uno:5V",    "red",    []],
+    ["uln2003:OUT1","stepper:A+","orange", []],
+    ["uln2003:OUT2","stepper:A-","orange", []],
+    ["uln2003:OUT3","stepper:B+","orange", []],
+    ["uln2003:OUT4","stepper:B-","orange", []],
+
+    ["sw_auto:1",  "uno:D12",   "purple", []],
+    ["sw_auto:2",  "uno:GND.2", "black",  []],
+
+    ["btn1:1.l",   "uno:A3",    "green",  []],
+    ["btn1:2.l",   "uno:GND.2", "black",  []],
+
+    ["btn2:1.l",   "uno:A4",    "green",  []],
+    ["btn2:2.l",   "uno:GND.2", "black",  []],
+
+    ["btn3:1.l",   "uno:A5",    "green",  []],
+    ["btn3:2.l",   "uno:GND.2", "black",  []],
+
+    ["led_r:A",    "r_r:1",     "red",    []],
+    ["r_r:2",      "uno:D7",    "red",    []],
+    ["led_r:K",    "uno:GND.2", "black",  []],
+
+    ["led_g:A",    "r_g:1",     "green",  []],
+    ["r_g:2",      "uno:D13",   "green",  []],
+    ["led_g:K",    "uno:GND.2", "black",  []],
+
+    ["led_y:A",    "r_y:1",     "yellow", []],
+    ["r_y:2",      "uno:D3",    "yellow", []],
+    ["led_y:K",    "uno:GND.2", "black",  []]
+
+  ],
+
+  "_notes": {
+    "BH1750": "조도센서(D3/D4 소프트웨어 I2C) — Wokwi 미지원. 실물 배선만 참고",
+    "Raspberry Pi": "USB 시리얼로 Arduino와 연결. Wokwi 미지원",
+    "Relay CH1": "펌프(수중펌프 5V) 연결 — NO/COM 단자 사용",
+    "Relay CH2": "환풍팬(DC 12V) 연결 — 외부 12V 전원 별도 필요",
+    "토양수분센서": "포텐셔미터로 대체 시뮬레이션. 실물은 캐패시티브 v1.2 사용"
+  }
+}
