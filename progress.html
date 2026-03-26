@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작업 진행 — SUNAE FARM</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">🌿</span>
+      <div>
+        <span class="logo-title">SUNAE FARM</span>
+        <span class="logo-sub">FARMOB v1</span>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link">홈</a>
+      <a href="manual.html" class="nav-link">설명서</a>
+      <a href="shopping.html" class="nav-link">구매 리스트</a>
+      <a href="circuit.html" class="nav-link">회로 설계</a>
+      <a href="progress.html" class="nav-link active">작업 진행</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-header">
+    <h1>작업 진행</h1>
+    <p>FARMOB v1 단계별 체크리스트 · 진행률 추적</p>
+  </div>
+
+  <div class="progress-controls">
+    <input type="text" id="progressSearch" class="search-input" placeholder="작업 검색...">
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="all">전체</button>
+      <button class="filter-btn" data-filter="done">완료</button>
+      <button class="filter-btn" data-filter="todo">미완료</button>
+    </div>
+  </div>
+
+  <div class="overall-progress">
+    <div class="progress-label">
+      <span>전체 진행률</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="phases" id="phaseList">
+
+    <div class="phase" data-phase="준비">
+      <div class="phase-header">
+        <h2>Phase 1 — 준비</h2>
+        <span class="phase-count"></span>
+      </div>
+      <div class="task-list">
+        <label class="task-item" data-tag="준비 설계 문서">
+          <input type="checkbox" checked>
+          <span class="task-text">설계 문서 작성 완료</span>
+          <span class="task-tag">설계</span>
+        </label>
+        <label class="task-item" data-tag="준비 구매 리스트">
+          <input type="checkbox" checked>
+          <span class="task-text">구매 리스트 작성 완료</span>
+          <span class="task-tag">구매</span>
+        </label>
+        <label class="task-item" data-tag="준비 GitHub">
+          <input type="checkbox" checked>
+          <span class="task-text">GitHub 저장소 생성 및 초기 push</span>
+          <span class="task-tag">GitHub</span>
+        </label>
+        <label class="task-item" data-tag="준비 Wokwi 회로">
+          <input type="checkbox" checked>
+          <span class="task-text">Wokwi diagram.json 작성</span>
+          <span class="task-tag">회로</span>
+        </label>
+        <label class="task-item" data-tag="준비 부품 구매">
+          <input type="checkbox">
+          <span class="task-text">부품 전체 구매</span>
+          <span class="task-tag">구매</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="phase" data-phase="하드웨어">
+      <div class="phase-header">
+        <h2>Phase 2 — 하드웨어 조립</h2>
+        <span class="phase-count"></span>
+      </div>
+      <div class="task-list">
+        <label class="task-item" data-tag="하드웨어 라즈베리파이 OS">
+          <input type="checkbox">
+          <span class="task-text">라즈베리파이 OS 설치 및 SSH 설정</span>
+          <span class="task-tag">라즈베리파이</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 Arduino 브레드보드">
+          <input type="checkbox">
+          <span class="task-text">Arduino + 브레드보드 기본 배선</span>
+          <span class="task-tag">Arduino</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 DHT22 센서">
+          <input type="checkbox">
+          <span class="task-text">DHT22 온습도 센서 연결 및 테스트</span>
+          <span class="task-tag">센서</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 토양수분 센서">
+          <input type="checkbox">
+          <span class="task-text">토양수분 센서 3개 연결 및 캘리브레이션</span>
+          <span class="task-tag">센서</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 BH1750 조도">
+          <input type="checkbox">
+          <span class="task-text">BH1750 조도 센서 연결 및 테스트</span>
+          <span class="task-tag">센서</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 릴레이 펌프">
+          <input type="checkbox">
+          <span class="task-text">릴레이 모듈 + 수중 펌프 연결 테스트</span>
+          <span class="task-tag">액추에이터</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 릴레이 팬">
+          <input type="checkbox">
+          <span class="task-text">릴레이 모듈 + 환풍팬 연결 테스트</span>
+          <span class="task-tag">액추에이터</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 스테퍼 측창">
+          <input type="checkbox">
+          <span class="task-text">28BYJ-48 스테퍼모터 + ULN2003 연결 테스트</span>
+          <span class="task-tag">액추에이터</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 토글 버튼">
+          <input type="checkbox">
+          <span class="task-text">토글 스위치 + 푸시버튼 연결 테스트</span>
+          <span class="task-tag">모드 스위칭</span>
+        </label>
+        <label class="task-item" data-tag="하드웨어 LED">
+          <input type="checkbox">
+          <span class="task-text">LED 상태 표시등 3색 연결</span>
+          <span class="task-tag">모드 스위칭</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="phase" data-phase="소프트웨어">
+      <div class="phase-header">
+        <h2>Phase 3 — 소프트웨어</h2>
+        <span class="phase-count"></span>
+      </div>
+      <div class="task-list">
+        <label class="task-item" data-tag="소프트웨어 Arduino 코드">
+          <input type="checkbox">
+          <span class="task-text">sunae_farm.ino 기본 코드 작성</span>
+          <span class="task-tag">Arduino</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 config">
+          <input type="checkbox">
+          <span class="task-text">config.py 임계값 설정</span>
+          <span class="task-tag">Python</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 main 자동화">
+          <input type="checkbox">
+          <span class="task-text">main.py 자동화 메인 로직 작성</span>
+          <span class="task-tag">Python</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 AUTO 모드">
+          <input type="checkbox">
+          <span class="task-text">AUTO 모드 동작 검증</span>
+          <span class="task-tag">테스트</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 MANUAL 모드">
+          <input type="checkbox">
+          <span class="task-text">MANUAL 모드 동작 검증</span>
+          <span class="task-tag">테스트</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 dashboard Flask">
+          <input type="checkbox">
+          <span class="task-text">dashboard.py Flask 웹 대시보드 작성</span>
+          <span class="task-tag">Python</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 REMOTE 모드">
+          <input type="checkbox">
+          <span class="task-text">REMOTE 모드 웹 제어 검증</span>
+          <span class="task-tag">테스트</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 텔레그램 봇">
+          <input type="checkbox">
+          <span class="task-text">telegram_bot.py 긴급 알림 작성 및 테스트</span>
+          <span class="task-tag">Python</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 fallback WiFi">
+          <input type="checkbox">
+          <span class="task-text">WiFi 끊김 Fallback 로직 구현 및 테스트</span>
+          <span class="task-tag">안정성</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 ngrok 원격">
+          <input type="checkbox">
+          <span class="task-text">ngrok 외부 접속 설정 및 테스트</span>
+          <span class="task-tag">원격</span>
+        </label>
+        <label class="task-item" data-tag="소프트웨어 systemd 서비스">
+          <input type="checkbox">
+          <span class="task-text">systemd 서비스 등록 (자동 시작)</span>
+          <span class="task-tag">배포</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="phase" data-phase="설치">
+      <div class="phase-header">
+        <h2>Phase 4 — 현장 설치</h2>
+        <span class="phase-count"></span>
+      </div>
+      <div class="task-list">
+        <label class="task-item" data-tag="설치 방수 케이스">
+          <input type="checkbox">
+          <span class="task-text">방수 케이스 조립 및 케이블 정리</span>
+          <span class="task-tag">설치</span>
+        </label>
+        <label class="task-item" data-tag="설치 하우스 전기">
+          <input type="checkbox">
+          <span class="task-text">비닐하우스 전기 인출 (멀티탭)</span>
+          <span class="task-tag">설치</span>
+        </label>
+        <label class="task-item" data-tag="설치 WiFi 연결">
+          <input type="checkbox">
+          <span class="task-text">하우스 현장 WiFi 연결 확인</span>
+          <span class="task-tag">설치</span>
+        </label>
+        <label class="task-item" data-tag="설치 센서 화분">
+          <input type="checkbox">
+          <span class="task-text">화분별 토양수분 센서 삽입</span>
+          <span class="task-tag">설치</span>
+        </label>
+        <label class="task-item" data-tag="설치 펌프 튜브">
+          <input type="checkbox">
+          <span class="task-text">펌프 + 실리콘 튜브 설치</span>
+          <span class="task-tag">설치</span>
+        </label>
+        <label class="task-item" data-tag="설치 팬 측창">
+          <input type="checkbox">
+          <span class="task-text">환풍팬 + 스테퍼모터 측창 설치</span>
+          <span class="task-tag">설치</span>
+        </label>
+        <label class="task-item" data-tag="설치 현장 테스트">
+          <input type="checkbox">
+          <span class="task-text">현장 전체 동작 테스트</span>
+          <span class="task-tag">테스트</span>
+        </label>
+        <label class="task-item" data-tag="설치 완료">
+          <input type="checkbox">
+          <span class="task-text">FARMOB v1 설치 완료 선언</span>
+          <span class="task-tag">완료</span>
+        </label>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+
+<script src="assets/app.js"></script>
+</body>
+</html>

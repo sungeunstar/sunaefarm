@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUNAE FARM — FARMOB v1</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">🌿</span>
+      <div>
+        <span class="logo-title">SUNAE FARM</span>
+        <span class="logo-sub">FARMOB v1</span>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link active">홈</a>
+      <a href="manual.html" class="nav-link">설명서</a>
+      <a href="shopping.html" class="nav-link">구매 리스트</a>
+      <a href="circuit.html" class="nav-link">회로 설계</a>
+      <a href="progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="container">
+      <p class="hero-eyebrow">비닐하우스 스마트팜 자동화 프로토타입</p>
+      <h1 class="hero-title">SUNAE FARM</h1>
+      <p class="hero-desc">라즈베리파이 4B + Arduino Uno · 자동관수 · 환풍 · 측창 제어<br>AUTO / REMOTE / MANUAL 3단계 모드 스위칭</p>
+      <div class="hero-badges">
+        <span class="badge">FARMOB v1</span>
+        <span class="badge">2026</span>
+        <span class="badge badge-green">진행 중</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="cards-section container">
+    <div class="cards">
+
+      <a href="manual.html" class="card">
+        <div class="card-icon">📋</div>
+        <h2 class="card-title">설명서</h2>
+        <p class="card-desc">시스템 구조, 핀맵, 자동화 조건, 모드 전환, 배포 방법, 트러블슈팅</p>
+        <span class="card-link">보기 →</span>
+      </a>
+
+      <a href="shopping.html" class="card">
+        <div class="card-icon">🛒</div>
+        <h2 class="card-title">구매 리스트</h2>
+        <p class="card-desc">전체 부품 목록, 카테고리 필터, 예상 총 비용 계산</p>
+        <span class="card-link">보기 →</span>
+      </a>
+
+      <a href="circuit.html" class="card">
+        <div class="card-icon">⚡</div>
+        <h2 class="card-title">회로 설계</h2>
+        <p class="card-desc">핀맵, 배선 가이드, Wokwi 시뮬레이터 연동</p>
+        <span class="card-link">보기 →</span>
+      </a>
+
+      <a href="progress.html" class="card">
+        <div class="card-icon">✅</div>
+        <h2 class="card-title">작업 진행</h2>
+        <p class="card-desc">단계별 체크리스트, 진행률, 키워드 검색</p>
+        <span class="card-link">보기 →</span>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="system-section container">
+    <h2 class="section-title">시스템 구조</h2>
+    <div class="arch-diagram">
+      <div class="arch-node arch-external">
+        <span class="arch-label">스마트폰 / 외부 PC</span>
+        <span class="arch-sub">SSH · 웹 대시보드 (ngrok)</span>
+      </div>
+      <div class="arch-arrow">↓</div>
+      <div class="arch-node arch-rpi">
+        <span class="arch-label">라즈베리파이 4B</span>
+        <span class="arch-sub">두뇌 · Python 자동화 · Flask · 텔레그램 봇</span>
+      </div>
+      <div class="arch-arrow">↓ USB 시리얼</div>
+      <div class="arch-node arch-arduino">
+        <span class="arch-label">Arduino Uno</span>
+        <span class="arch-sub">근육 · 센서 읽기 · 릴레이 · 스테퍼 · 버튼</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="modes-section container">
+    <h2 class="section-title">동작 모드</h2>
+    <div class="modes">
+      <div class="mode mode-auto">
+        <div class="mode-indicator"></div>
+        <h3>AUTO</h3>
+        <p>토글 스위치로 전환<br>센서값 기반 자동 제어</p>
+      </div>
+      <div class="mode mode-remote">
+        <div class="mode-indicator"></div>
+        <h3>REMOTE</h3>
+        <p>웹 대시보드에서 명령<br>명령 후 AUTO 복귀</p>
+      </div>
+      <div class="mode mode-manual">
+        <div class="mode-indicator"></div>
+        <h3>MANUAL</h3>
+        <p>현장 물리 버튼 직접 제어<br>라즈베리파이 명령 무시</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

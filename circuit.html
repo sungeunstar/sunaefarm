@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회로 설계 — SUNAE FARM</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">🌿</span>
+      <div>
+        <span class="logo-title">SUNAE FARM</span>
+        <span class="logo-sub">FARMOB v1</span>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="index.html" class="nav-link">홈</a>
+      <a href="manual.html" class="nav-link">설명서</a>
+      <a href="shopping.html" class="nav-link">구매 리스트</a>
+      <a href="circuit.html" class="nav-link active">회로 설계</a>
+      <a href="progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="page-header">
+    <h1>회로 설계</h1>
+    <p>Arduino Uno 핀맵 · 배선 가이드 · Wokwi 시뮬레이터</p>
+  </div>
+
+  <div class="circuit-grid">
+
+    <div class="circuit-card">
+      <h2>Wokwi 시뮬레이터</h2>
+      <p>브라우저에서 실제 회로를 시뮬레이션할 수 있습니다. 실물 조립 전 동작을 미리 확인하세요.</p>
+      <div class="wokwi-placeholder">
+        <div class="placeholder-icon">⚡</div>
+        <p>Wokwi 프로젝트 준비 중</p>
+        <p class="placeholder-sub">diagram.json을 Wokwi에 임포트하면 시뮬레이션이 가능합니다</p>
+        <a href="wokwi/diagram.json" class="btn" download>diagram.json 다운로드</a>
+        <a href="https://wokwi.com" target="_blank" class="btn btn-outline">Wokwi 열기</a>
+      </div>
+      <div class="info-box" style="margin-top:1rem">
+        <strong>Wokwi 임포트 방법</strong>
+        <ol>
+          <li>wokwi.com 접속 → New Project → Arduino Uno</li>
+          <li>좌측 파일 목록에서 diagram.json 클릭</li>
+          <li>내용 전체를 다운로드한 파일로 교체</li>
+          <li>저장 후 시뮬레이션 실행</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="circuit-card">
+      <h2>회로 이미지</h2>
+      <div class="image-placeholder">
+        <div class="placeholder-icon">📷</div>
+        <p>회로 이미지 업로드 대기 중</p>
+        <p class="placeholder-sub">Fritzing 또는 실물 사진을 <br><code>assets/images/circuit.png</code> 경로에 추가하세요</p>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="pinmap-section">
+    <h2>핀맵 (Arduino Uno)</h2>
+
+    <div class="pinmap-grid">
+
+      <div class="pin-group">
+        <h3 class="pin-group-title sensor">센서</h3>
+        <div class="pin-row"><span class="pin-num">A0</span><span class="pin-name">토양수분 센서 1</span><span class="pin-note">민트</span></div>
+        <div class="pin-row"><span class="pin-num">A1</span><span class="pin-name">토양수분 센서 2</span><span class="pin-note">레몬밤</span></div>
+        <div class="pin-row"><span class="pin-num">A2</span><span class="pin-name">토양수분 센서 3</span><span class="pin-note">바질</span></div>
+        <div class="pin-row"><span class="pin-num">D2</span><span class="pin-name">DHT22 온습도</span><span class="pin-note warn">10kΩ 풀업저항 필수</span></div>
+        <div class="pin-row"><span class="pin-num">D3</span><span class="pin-name">BH1750 SDA</span><span class="pin-note">소프트웨어 I2C</span></div>
+        <div class="pin-row"><span class="pin-num">D4</span><span class="pin-name">BH1750 SCL</span><span class="pin-note">소프트웨어 I2C</span></div>
+      </div>
+
+      <div class="pin-group">
+        <h3 class="pin-group-title actuator">액추에이터</h3>
+        <div class="pin-row"><span class="pin-num">D5</span><span class="pin-name">릴레이 CH1</span><span class="pin-note">펌프</span></div>
+        <div class="pin-row"><span class="pin-num">D6</span><span class="pin-name">릴레이 CH2</span><span class="pin-note">환풍팬</span></div>
+        <div class="pin-row"><span class="pin-num">D8</span><span class="pin-name">ULN2003 IN1</span><span class="pin-note">측창 스테퍼</span></div>
+        <div class="pin-row"><span class="pin-num">D9</span><span class="pin-name">ULN2003 IN2</span><span class="pin-note">측창 스테퍼</span></div>
+        <div class="pin-row"><span class="pin-num">D10</span><span class="pin-name">ULN2003 IN3</span><span class="pin-note">측창 스테퍼</span></div>
+        <div class="pin-row"><span class="pin-num">D11</span><span class="pin-name">ULN2003 IN4</span><span class="pin-note">측창 스테퍼</span></div>
+      </div>
+
+      <div class="pin-group">
+        <h3 class="pin-group-title mode">모드 스위칭</h3>
+        <div class="pin-row"><span class="pin-num">D12</span><span class="pin-name">토글 스위치</span><span class="pin-note">AUTO↔MANUAL</span></div>
+        <div class="pin-row"><span class="pin-num">A3</span><span class="pin-name">푸시버튼 1</span><span class="pin-note">수동 제어</span></div>
+        <div class="pin-row"><span class="pin-num">A4</span><span class="pin-name">푸시버튼 2</span><span class="pin-note">수동 제어</span></div>
+        <div class="pin-row"><span class="pin-num">A5</span><span class="pin-name">푸시버튼 3</span><span class="pin-note">수동 제어</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="wiring-section">
+    <h2>배선 주의사항</h2>
+    <div class="warning-list">
+      <div class="warning-item">⚠️ DHT22: DATA 핀과 VCC 사이에 반드시 10kΩ 풀업저항 연결</div>
+      <div class="warning-item">⚠️ 릴레이 CH2 (팬): 12V 외부 전원 별도 연결 필요</div>
+      <div class="warning-item">⚠️ 관수 중 측창 열기 금지 — 물 튀김 사고 방지</div>
+      <div class="warning-item">⚠️ 스테퍼모터: 반드시 ULN2003 드라이버 경유. Arduino 직결 금지</div>
+      <div class="warning-item">⚠️ 모든 GND는 공통 접지 (Arduino GND)</div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
