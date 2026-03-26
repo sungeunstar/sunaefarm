@@ -38,8 +38,8 @@
     <pre class="code-block"># raspberry/config.py
 
 # ── 관수 설정 ────────────────────────────
-SOIL_DRY_THRESHOLD   = 40    # 토양수분 40% 이하 → 펌프 ON
-PUMP_DURATION_SEC    = 5     # 펌프 작동 시간 (초)
+SOIL_DRY_THRESHOLD   = 40    # 토양수분 40% 이하 → 관수 시작
+VALVE_DURATION_SEC   = 60    # 전자밸브 열기 시간 (초) — 점적관수는 천천히 긴 시간 필요
 WATERING_INTERVAL    = 1800  # 관수 후 대기 시간 (초, 30분)
 
 # ── 환풍 설정 ────────────────────────────
@@ -60,19 +60,20 @@ SERIAL_PORT          = '/dev/ttyUSB0'
 BAUD_RATE            = 9600</pre>
 
     <h2>관수 (Watering)</h2>
-    <p>토양수분 센서 3개(민트·레몬밤·바질)를 독립적으로 모니터링합니다. 각 화분별로 조건을 판단하고 순차적으로 관수합니다.</p>
+    <p>토양수분 센서 3개(민트·레몬밤·바질)를 구역별로 독립 모니터링합니다. 조건이 충족된 구역의 전자밸브를 순차적으로 열어 점적관수합니다. PW-350SMA는 압력 스위치 내장으로 전자밸브가 열리면 자동 ON, 닫히면 자동 OFF됩니다. <strong>Arduino는 펌프를 직접 제어하지 않습니다.</strong></p>
 
     <div class="flow">
       <div class="flow-item"><span class="flow-num">1</span>A0/A1/A2 → 토양수분 읽기 (0~100%)</div>
-      <div class="flow-item"><span class="flow-num">2</span>40% 이하인 화분 확인</div>
+      <div class="flow-item"><span class="flow-num">2</span>40% 이하인 구역 확인</div>
       <div class="flow-item"><span class="flow-num">3</span>관수 대기 시간(30분) 경과 여부 확인</div>
-      <div class="flow-item"><span class="flow-num">4</span>펌프 5초 ON → OFF</div>
-      <div class="flow-item"><span class="flow-num">5</span>30분 타이머 리셋</div>
+      <div class="flow-item"><span class="flow-num">4</span>해당 구역 전자밸브 열기 → 수압 저하 → 펌프 자동 ON</div>
+      <div class="flow-item"><span class="flow-num">5</span>60초 후 전자밸브 닫기 → 압력 회복 → 펌프 자동 OFF</div>
+      <div class="flow-item"><span class="flow-num">6</span>다음 구역으로 이동 (순차 처리) → 30분 타이머 리셋</div>
     </div>
 
     <div class="callout callout-danger">
-      <div class="callout-title">3개 화분 동시 관수 금지</div>
-      펌프 3개가 동시에 켜지면 전류 과부하로 릴레이가 손상될 수 있습니다. 반드시 순차 관수(화분 1 → 대기 → 화분 2 → 대기 → 화분 3)로 구현해야 합니다.
+      <div class="callout-title">전자밸브 동시 열기 금지</div>
+      3개 구역 전자밸브를 동시에 열면 수압이 분산되어 점적기마다 유량이 불균일해지고 펌프 부하가 증가합니다. 반드시 순차 관수(구역 1 → 완료 → 구역 2 → 완료 → 구역 3)로 구현해야 합니다.
     </div>
 
     <div class="callout callout-danger">
@@ -96,7 +97,7 @@ BAUD_RATE            = 9600</pre>
     </table>
 
     <h2>측창 (Window)</h2>
-    <p>스테퍼모터(28BYJ-48)로 측창을 열고 닫습니다. 모터가 도달할 수 있는 최대 개방/폐쇄 위치를 소프트웨어에서 스텝 수로 제한합니다.</p>
+    <p>K-6060 DC 24V 모터로 측창을 열고 닫습니다. D10/D11 리밋 스위치가 측창이 완전히 열리거나 닫혔을 때 모터를 자동 정지시킵니다. 스텝 수 제한 방식이 아니라 물리적 리밋 스위치로 끝 위치를 감지합니다.</p>
 
     <div class="callout callout-warn">
       <div class="callout-title">측창 개방 중 관수 금지</div>
