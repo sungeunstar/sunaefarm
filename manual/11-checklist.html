@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설치 전 체크리스트 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">11. 설치 전 체크리스트</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">11 / 11</div>
+    <h1>설치 전 체크리스트</h1>
+    <p class="desc">하우스 현장 이동 전 반드시 확인해야 할 항목들</p>
+  </div>
+  <div class="manual-body">
+
+    <div class="callout callout-danger">
+      <div class="callout-title">현장에서 처음 발견한 문제는 집에서보다 2배 어렵습니다</div>
+      아래 항목을 집에서 100% 통과한 후에만 하우스로 이동하세요.
+    </div>
+
+    <h2>센서 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> DHT22 → 온도·습도 정상값 출력 확인 (NaN·-1 아님)</label>
+      <label><input type="checkbox"> 토양수분 센서 3개 → 공기 중·물 속 각각 다른 값 출력 확인</label>
+      <label><input type="checkbox"> BH1750 → 빛의 밝기에 따라 값이 변하는지 확인</label>
+      <label><input type="checkbox"> 모든 센서 이상치(0, -1, NaN) 처리 코드 동작 확인</label>
+    </div>
+
+    <h2>액추에이터 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> 릴레이 CH1 → 수중 펌프 ON/OFF 동작 확인</label>
+      <label><input type="checkbox"> 릴레이 CH2 → 환풍팬 ON/OFF 동작 확인</label>
+      <label><input type="checkbox"> ULN2003 + 스테퍼모터 → 측창 열기/닫기 동작 확인</label>
+      <label><input type="checkbox"> 펌프 작동 시간 5초 후 자동 정지 확인</label>
+      <label><input type="checkbox"> 관수 후 30분 대기 타이머 동작 확인</label>
+    </div>
+
+    <h2>모드 전환 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> 토글 스위치 → AUTO 위치 시 자동화 정상 동작</label>
+      <label><input type="checkbox"> 토글 스위치 → MANUAL 위치 시 라즈베리파이 명령 무시 확인</label>
+      <label><input type="checkbox"> MANUAL 모드 → 버튼 1 (펌프) 수동 ON/OFF 동작</label>
+      <label><input type="checkbox"> MANUAL 모드 → 버튼 2 (팬) 수동 ON/OFF 동작</label>
+      <label><input type="checkbox"> MANUAL 모드 → 버튼 3 (측창) 수동 열기/닫기 동작</label>
+      <label><input type="checkbox"> LED 상태 표시 → 각 모드에서 올바른 색상 점등 확인</label>
+      <label><input type="checkbox"> 웹 대시보드에서 REMOTE 명령 → Arduino 동작 확인</label>
+    </div>
+
+    <h2>안전 인터락 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> 관수 중 측창 열기 명령 → 실행되지 않음 확인</label>
+      <label><input type="checkbox"> 측창 열린 상태에서 관수 명령 → 측창 먼저 닫은 후 관수 확인</label>
+    </div>
+
+    <h2>네트워크 / 원격 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> SSH 로컬 접속 정상 확인</label>
+      <label><input type="checkbox"> ngrok 터널 실행 및 외부 SSH 접속 확인</label>
+      <label><input type="checkbox"> 웹 대시보드 로컬 접속 (http://sunaefarm.local:5000) 확인</label>
+      <label><input type="checkbox"> 웹 대시보드 외부 접속 (ngrok URL) 확인</label>
+      <label><input type="checkbox"> 텔레그램 알림 수신 확인 (35°C 조건을 임시로 낮춰서 테스트)</label>
+    </div>
+
+    <h2>WiFi Fallback 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> WiFi 라우터 전원을 끄고 → Arduino 자동화 계속 동작하는지 확인</label>
+      <label><input type="checkbox"> WiFi 재연결 후 → 라즈베리파이 자동 복귀 확인</label>
+    </div>
+
+    <h2>systemd 서비스 테스트</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> systemctl status sunae-farm → active (running) 확인</label>
+      <label><input type="checkbox"> 라즈베리파이 재부팅 후 → 서비스 자동 시작 확인</label>
+      <label><input type="checkbox"> GitHub push → git pull → 서비스 재시작 배포 테스트</label>
+    </div>
+
+    <h2>현장 이동 전 물리 점검</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> 방수 인클로저 케이스 밀폐 확인 (나사 모두 조임)</label>
+      <label><input type="checkbox"> 케이블 타이로 전선 정리 완료</label>
+      <label><input type="checkbox"> 노출 단자 절연 테이프 처리 완료</label>
+      <label><input type="checkbox"> 12V 어댑터 DC잭 규격 확인 (5.5/2.1mm)</label>
+      <label><input type="checkbox"> 모든 커넥터 단단히 연결 확인 (흔들어도 빠지지 않는지)</label>
+      <label><input type="checkbox"> 실리콘 튜브 누수 없음 확인 (물 컵으로 펌프 동작 테스트)</label>
+    </div>
+
+    <div class="callout callout-info" style="margin-top:2rem">
+      <div class="callout-title">전체 통과 확인 후 현장 이동</div>
+      위 모든 항목에 체크가 완료되면 비닐하우스 현장 설치를 진행해도 좋습니다. 체크되지 않은 항목이 하나라도 있다면 그것부터 해결하세요.
+    </div>
+
+  </div>
+  <div class="page-nav">
+    <a href="10-guardrails.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">10. 절대 금지 규칙</span></a>
+    <a href="../manual.html" class="next"><span class="nav-dir">설명서 목록으로</span><span class="nav-title">설명서 홈</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+<script src="../assets/app.js"></script>
+</body>
+</html>

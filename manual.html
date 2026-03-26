@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>설명서 — SUNAE FARM</title>
 <link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/manual.css">
 </head>
 <body>
 
@@ -27,210 +28,112 @@
   </div>
 </header>
 
-<main>
-  <div class="page-layout container">
+<main class="container">
 
-    <aside class="sidebar">
-      <nav class="sidebar-nav">
-        <p class="sidebar-heading">목차</p>
-        <a href="#overview" class="sidebar-link">1. 프로젝트 개요</a>
-        <a href="#architecture" class="sidebar-link">2. 시스템 구조</a>
-        <a href="#modes" class="sidebar-link">3. 동작 모드</a>
-        <a href="#automation" class="sidebar-link">4. 자동화 조건</a>
-        <a href="#pinmap" class="sidebar-link">5. 핀맵</a>
-        <a href="#setup" class="sidebar-link">6. 설치 방법</a>
-        <a href="#deploy" class="sidebar-link">7. 코드 배포</a>
-        <a href="#remote" class="sidebar-link">8. 원격 접속</a>
-        <a href="#troubleshoot" class="sidebar-link">9. 트러블슈팅</a>
-        <a href="#guardrails" class="sidebar-link">10. 절대 금지</a>
-        <a href="#checklist" class="sidebar-link">11. 설치 전 체크리스트</a>
-      </nav>
-    </aside>
-
-    <article class="content">
-
-      <div class="page-header">
-        <h1>설명서</h1>
-        <p>SUNAE FARM · FARMOB v1 시스템 전체 가이드</p>
-      </div>
-
-      <section id="overview">
-        <h2>1. 프로젝트 개요</h2>
-        <p>친구 농장(비닐하우스)에 설치할 스마트팜 자동화 시스템 프로토타입입니다. 라즈베리파이 4B가 두뇌, Arduino Uno가 근육 역할을 맡는 이중 구조로 설계되었습니다.</p>
-        <div class="info-box">
-          <strong>핵심 기능</strong>
-          <ul>
-            <li>토양수분 감지 → 자동 관수</li>
-            <li>온습도 감지 → 환풍팬 자동 제어</li>
-            <li>온도 감지 → 측창 자동 개폐</li>
-            <li>긴급 알림 → 텔레그램 봇</li>
-            <li>원격 제어 → 웹 대시보드 (ngrok)</li>
-          </ul>
-        </div>
-      </section>
-
-      <section id="architecture">
-        <h2>2. 시스템 구조</h2>
-        <pre class="code-block">[ 스마트폰 / 외부 PC ]
-        ↓ SSH (ngrok 터널)
-[ 라즈베리파이 4B ]  ← 두뇌
-  ├─ 조건 판단 (Python)
-  ├─ 웹 대시보드 (Flask)
-  ├─ 텔레그램 봇
-  └─ git pull → 코드 배포
-        ↓ USB 시리얼 (9600bps)
-[ Arduino Uno ]  ← 근육
-  ├─ 센서 읽기
-  ├─ 릴레이 제어
-  └─ 버튼 입력 (MANUAL 모드)</pre>
-      </section>
-
-      <section id="modes">
-        <h2>3. 동작 모드</h2>
-        <table class="data-table">
-          <thead><tr><th>모드</th><th>전환 방법</th><th>설명</th></tr></thead>
-          <tbody>
-            <tr><td><span class="badge badge-green">AUTO</span></td><td>토글 스위치</td><td>센서값 기반 자동 제어</td></tr>
-            <tr><td><span class="badge badge-blue">REMOTE</span></td><td>웹 대시보드</td><td>원격 수동 명령 → AUTO 복귀</td></tr>
-            <tr><td><span class="badge badge-yellow">MANUAL</span></td><td>현장 물리 버튼</td><td>버튼 직접 제어 · 라즈베리파이 무시</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section id="automation">
-        <h2>4. 자동화 조건</h2>
-        <pre class="code-block"># config.py 에서 수정
-
-# 관수
-SOIL_DRY_THRESHOLD   = 40    # 토양수분 40% 이하 → 펌프 ON
-PUMP_DURATION_SEC    = 5     # 펌프 작동 시간 (초)
-WATERING_INTERVAL    = 1800  # 관수 후 대기 (초, 30분)
-
-# 환풍
-FAN_TEMP_ON          = 28    # 온도 28°C 초과 → 팬 ON
-FAN_TEMP_OFF         = 25    # 온도 25°C 이하 → 팬 OFF
-FAN_HUM_ON           = 80    # 습도 80% 초과 → 팬 ON
-
-# 측창
-WINDOW_OPEN_TEMP     = 30    # 온도 30°C 초과 → 측창 열기
-WINDOW_CLOSE_TEMP    = 25    # 온도 25°C 이하 → 측창 닫기
-
-# 긴급 알림
-ALERT_TEMP           = 35    # 온도 35°C 초과 → 텔레그램 긴급 알림</pre>
-      </section>
-
-      <section id="pinmap">
-        <h2>5. 핀맵 (Arduino Uno)</h2>
-        <table class="data-table">
-          <thead><tr><th>핀</th><th>연결 부품</th><th>비고</th></tr></thead>
-          <tbody>
-            <tr><td>A0</td><td>토양수분 센서 1 (민트)</td><td></td></tr>
-            <tr><td>A1</td><td>토양수분 센서 2 (레몬밤)</td><td></td></tr>
-            <tr><td>A2</td><td>토양수분 센서 3 (바질)</td><td></td></tr>
-            <tr><td>D2</td><td>DHT22 온습도</td><td><strong>10kΩ 풀업저항 필수</strong></td></tr>
-            <tr><td>D3</td><td>BH1750 SDA</td><td>소프트웨어 I2C</td></tr>
-            <tr><td>D4</td><td>BH1750 SCL</td><td>소프트웨어 I2C</td></tr>
-            <tr><td>D5</td><td>릴레이 CH1 (펌프)</td><td></td></tr>
-            <tr><td>D6</td><td>릴레이 CH2 (팬)</td><td></td></tr>
-            <tr><td>D8~D11</td><td>ULN2003 IN1~4 (스테퍼)</td><td>측창</td></tr>
-            <tr><td>D12</td><td>토글 스위치</td><td>AUTO↔MANUAL</td></tr>
-            <tr><td>A3~A5</td><td>푸시버튼 × 3</td><td>수동 제어</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section id="setup">
-        <h2>6. 설치 방법</h2>
-        <pre class="code-block"># 1. 저장소 클론
-git clone https://github.com/sungeunstar/sunaefarm.git
-cd sunaefarm
-
-# 2. 라즈베리파이 의존성 설치
-pip3 install pyserial flask python-telegram-bot --break-system-packages
-
-# 3. arduino-cli 설치 확인
-arduino-cli version
-
-# 4. Arduino 코드 업로드
-arduino-cli compile --fqbn arduino:avr:uno arduino/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno arduino/
-
-# 5. 메인 자동화 실행
-python3 raspberry/main.py</pre>
-      </section>
-
-      <section id="deploy">
-        <h2>7. 코드 배포</h2>
-        <pre class="code-block"># 라즈베리파이에서
-cd ~/sunaefarm
-git pull
-
-# Arduino 코드도 바뀐 경우
-arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno arduino/
-
-# 서비스 재시작
-sudo systemctl restart sunae-farm</pre>
-      </section>
-
-      <section id="remote">
-        <h2>8. 원격 접속</h2>
-        <pre class="code-block"># 같은 WiFi (집)
-ssh pi@192.168.x.x
-
-# 외부 어디서든 (ngrok)
-# 라즈베리파이에서:
-ngrok tcp 22
-# 외부에서:
-ssh pi@0.tcp.ngrok.io -p [포트번호]</pre>
-      </section>
-
-      <section id="troubleshoot">
-        <h2>9. 트러블슈팅</h2>
-        <table class="data-table">
-          <thead><tr><th>증상</th><th>원인</th><th>해결</th></tr></thead>
-          <tbody>
-            <tr><td>토양수분 값이 0 또는 이상한 값</td><td>저항식 센서 사용 or 캘리브레이션 필요</td><td>캐패시티브 v1.2 확인, 공기·물 기준값 재설정</td></tr>
-            <tr><td>DHT22 값이 -1</td><td>풀업저항 없음</td><td>D2-VCC 사이 10kΩ 저항 연결</td></tr>
-            <tr><td>Arduino 업로드 안 됨</td><td>포트 확인 필요</td><td><code>ls /dev/ttyUSB*</code> 또는 <code>ls /dev/ttyACM*</code></td></tr>
-            <tr><td>WiFi 끊겨도 동작 유지 안 됨</td><td>Fallback 코드 누락</td><td>Arduino 독립 로직 확인</td></tr>
-            <tr><td>웹 대시보드 안 열림</td><td>Flask 포트 충돌</td><td><code>sudo lsof -i :5000</code> 확인</td></tr>
-            <tr><td>텔레그램 알림 안 옴</td><td>봇 토큰 or CHAT_ID 오류</td><td>config.py 확인</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section id="guardrails">
-        <h2>10. 절대 금지</h2>
-        <div class="warning-list">
-          <div class="warning-item">❌ <code>delay()</code>로 센서 블로킹 → <code>millis()</code> 기반으로만</div>
-          <div class="warning-item">❌ <code>loop()</code> 안에 <code>while(true)</code> 중첩</div>
-          <div class="warning-item">❌ 핀 번호 하드코딩 → <code>#define</code> 또는 <code>const</code></div>
-          <div class="warning-item">❌ 릴레이 전압 미확인 배선</div>
-          <div class="warning-item">❌ 센서 이상치(0 / -1 / NaN) 처리 없이 진행</div>
-          <div class="warning-item">❌ 관수 중 측창 동시 작동 → 물 튀김 방지</div>
-          <div class="warning-item">❌ WiFi 끊겼을 때 로컬 fallback 없는 구조</div>
-          <div class="warning-item">❌ 저항식 토양수분 센서 → 반드시 캐패시티브</div>
-          <div class="warning-item">❌ DHT11 사용 → 반드시 DHT22</div>
-        </div>
-      </section>
-
-      <section id="checklist">
-        <h2>11. 설치 전 체크리스트</h2>
-        <div class="checklist">
-          <label><input type="checkbox"> 집에서 센서 개별 테스트 완료</label>
-          <label><input type="checkbox"> 릴레이 펌프·팬·스테퍼 동작 확인</label>
-          <label><input type="checkbox"> AUTO / REMOTE / MANUAL 모드 전환 확인</label>
-          <label><input type="checkbox"> WiFi 끊김 Fallback 테스트</label>
-          <label><input type="checkbox"> 텔레그램 알림 수신 확인</label>
-          <label><input type="checkbox"> 웹 대시보드 외부 접속 확인 (ngrok)</label>
-          <label><input type="checkbox"> 방수 케이스 밀폐 확인</label>
-          <label><input type="checkbox"> 케이블 타이 + 절연 테이프 처리</label>
-          <label><input type="checkbox"> GitHub push → pull 배포 테스트</label>
-        </div>
-      </section>
-
-    </article>
+  <div class="breadcrumb">
+    <a href="index.html">홈</a>
+    <span class="sep">›</span>
+    <span class="current">설명서</span>
   </div>
+
+  <div class="manual-header">
+    <div class="label">Documentation</div>
+    <h1>설명서</h1>
+    <p class="desc">SUNAE FARM · FARMOB v1 시스템 전체 가이드 — 총 11개 섹션</p>
+  </div>
+
+  <div class="manual-cards">
+
+    <a href="manual/01-overview.html" class="manual-card">
+      <div class="manual-card-num">01</div>
+      <div>
+        <div class="manual-card-title">프로젝트 개요</div>
+        <div class="manual-card-desc">이 시스템이 무엇인지, 왜 만들었는지, 핵심 기능 요약</div>
+      </div>
+    </a>
+
+    <a href="manual/02-architecture.html" class="manual-card">
+      <div class="manual-card-num">02</div>
+      <div>
+        <div class="manual-card-title">시스템 구조</div>
+        <div class="manual-card-desc">라즈베리파이 + Arduino 이중 구조 설계 이유와 통신 방식</div>
+      </div>
+    </a>
+
+    <a href="manual/03-modes.html" class="manual-card">
+      <div class="manual-card-num">03</div>
+      <div>
+        <div class="manual-card-title">동작 모드</div>
+        <div class="manual-card-desc">AUTO / REMOTE / MANUAL 3단계 모드 전환 원리와 동작 방식</div>
+      </div>
+    </a>
+
+    <a href="manual/04-automation.html" class="manual-card">
+      <div class="manual-card-num">04</div>
+      <div>
+        <div class="manual-card-title">자동화 조건</div>
+        <div class="manual-card-desc">관수·환풍·측창·긴급 알림 조건 및 임계값 설정 방법</div>
+      </div>
+    </a>
+
+    <a href="manual/05-pinmap.html" class="manual-card">
+      <div class="manual-card-num">05</div>
+      <div>
+        <div class="manual-card-title">핀맵</div>
+        <div class="manual-card-desc">Arduino Uno 전체 핀 배정, 배선 원칙, 주의사항</div>
+      </div>
+    </a>
+
+    <a href="manual/06-setup.html" class="manual-card">
+      <div class="manual-card-num">06</div>
+      <div>
+        <div class="manual-card-title">설치 방법</div>
+        <div class="manual-card-desc">라즈베리파이 OS 설치부터 첫 실행까지 단계별 가이드</div>
+      </div>
+    </a>
+
+    <a href="manual/07-deploy.html" class="manual-card">
+      <div class="manual-card-num">07</div>
+      <div>
+        <div class="manual-card-title">코드 배포</div>
+        <div class="manual-card-desc">GitHub → git pull → Arduino 업로드 배포 파이프라인</div>
+      </div>
+    </a>
+
+    <a href="manual/08-remote.html" class="manual-card">
+      <div class="manual-card-num">08</div>
+      <div>
+        <div class="manual-card-title">원격 접속</div>
+        <div class="manual-card-desc">SSH, ngrok 터널, 웹 대시보드 외부 접속 설정</div>
+      </div>
+    </a>
+
+    <a href="manual/09-troubleshoot.html" class="manual-card">
+      <div class="manual-card-num">09</div>
+      <div>
+        <div class="manual-card-title">트러블슈팅</div>
+        <div class="manual-card-desc">센서 오류, 업로드 실패, WiFi 끊김 등 문제별 해결법</div>
+      </div>
+    </a>
+
+    <a href="manual/10-guardrails.html" class="manual-card">
+      <div class="manual-card-num">10</div>
+      <div>
+        <div class="manual-card-title">절대 금지 규칙</div>
+        <div class="manual-card-desc">FARMOB 가드레일 — 이유와 함께 설명하는 금지 패턴 9가지</div>
+      </div>
+    </a>
+
+    <a href="manual/11-checklist.html" class="manual-card">
+      <div class="manual-card-num">11</div>
+      <div>
+        <div class="manual-card-title">설치 전 체크리스트</div>
+        <div class="manual-card-desc">하우스 현장 이동 전 반드시 확인해야 할 항목들</div>
+      </div>
+    </a>
+
+  </div>
+
 </main>
 
 <footer class="site-footer">
@@ -239,6 +142,5 @@ ssh pi@0.tcp.ngrok.io -p [포트번호]</pre>
   </div>
 </footer>
 
-<script src="assets/app.js"></script>
 </body>
 </html>

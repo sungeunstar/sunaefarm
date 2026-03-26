@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원격 접속 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">08. 원격 접속</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">08 / 11</div>
+    <h1>원격 접속</h1>
+    <p class="desc">SSH, ngrok 터널, 웹 대시보드 외부 접속 설정</p>
+  </div>
+  <div class="manual-body">
+
+    <h2>접속 방법 비교</h2>
+    <table class="spec-table">
+      <thead><tr><th>방법</th><th>조건</th><th>속도</th><th>용도</th></tr></thead>
+      <tbody>
+        <tr><td>로컬 SSH</td><td>같은 WiFi</td><td>빠름</td><td>집에서 개발할 때</td></tr>
+        <tr><td>ngrok SSH 터널</td><td>어디서든</td><td>보통</td><td>외부에서 코드 수정·디버깅</td></tr>
+        <tr><td>웹 대시보드 (로컬)</td><td>같은 WiFi</td><td>빠름</td><td>센서값 확인·수동 제어</td></tr>
+        <tr><td>웹 대시보드 (ngrok)</td><td>어디서든</td><td>보통</td><td>외부에서 모니터링·제어</td></tr>
+      </tbody>
+    </table>
+
+    <h2>로컬 SSH (집 내부)</h2>
+    <pre class="code-block">ssh pi@sunaefarm.local
+# 또는 IP 주소로
+ssh pi@192.168.1.xxx</pre>
+
+    <h2>ngrok 설치 및 설정</h2>
+    <ol class="step-list">
+      <li>ngrok.com 가입 → 무료 계정 생성</li>
+      <li>라즈베리파이에 ngrok 설치
+        <pre class="code-block" style="margin-top:.5rem">curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc
+echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+sudo apt update && sudo apt install ngrok</pre>
+      </li>
+      <li>인증 토큰 등록 (ngrok 대시보드에서 확인)
+        <pre class="code-block" style="margin-top:.5rem">ngrok config add-authtoken YOUR_TOKEN_HERE</pre>
+      </li>
+    </ol>
+
+    <h2>ngrok SSH 터널 실행</h2>
+    <pre class="code-block"># 라즈베리파이에서 실행
+ngrok tcp 22
+
+# 출력 예시:
+# Forwarding  tcp://0.tcp.ngrok.io:12345 -> localhost:22
+
+# 외부에서 접속 (다른 PC / 스마트폰 터미널)
+ssh pi@0.tcp.ngrok.io -p 12345</pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">ngrok 무료 계정의 포트 번호는 매번 바뀝니다</div>
+      ngrok을 재실행할 때마다 포트 번호가 달라집니다. 고정 도메인이 필요하면 ngrok 유료 플랜을 사용하거나, 텔레그램 봇으로 새 포트 번호를 알림받도록 코드를 추가할 수 있습니다.
+    </div>
+
+    <h2>ngrok 웹 대시보드 터널</h2>
+    <pre class="code-block"># SSH 터널과 별개로 웹 대시보드용 터널 추가
+ngrok http 5000
+
+# 출력 예시:
+# Forwarding  https://xxxx.ngrok-free.app -> http://localhost:5000
+
+# 외부에서 브라우저로 접속
+# https://xxxx.ngrok-free.app</pre>
+
+    <h2>ngrok 자동 시작 설정 (부팅 시)</h2>
+    <pre class="code-block">sudo nano /etc/systemd/system/ngrok.service</pre>
+    <pre class="code-block">[Unit]
+Description=ngrok tunnel
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/ngrok tcp 22 --log=stdout
+User=pi
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</pre>
+    <pre class="code-block">sudo systemctl enable ngrok
+sudo systemctl start ngrok</pre>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">보안 주의</div>
+      ngrok 터널을 열면 인터넷에서 라즈베리파이에 접속할 수 있게 됩니다. 반드시 강력한 SSH 비밀번호 또는 키 인증을 사용하세요. 기본 비밀번호 <code>raspberry</code>는 절대 그대로 두지 마세요.
+    </div>
+
+  </div>
+  <div class="page-nav">
+    <a href="07-deploy.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">07. 코드 배포</span></a>
+    <a href="09-troubleshoot.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">09. 트러블슈팅</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>

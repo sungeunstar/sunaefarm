@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>절대 금지 규칙 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">10. 절대 금지 규칙</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">10 / 11</div>
+    <h1>절대 금지 규칙</h1>
+    <p class="desc">FARMOB 가드레일 — 이유와 함께 설명하는 금지 패턴 9가지</p>
+  </div>
+  <div class="manual-body">
+
+    <p>아래 규칙은 단순한 권고가 아닙니다. 농장에서 실제로 발생할 수 있는 <strong>장비 손상·오작동·화재 위험</strong>을 방지하기 위한 안전 규칙입니다.</p>
+
+    <h2>코드 관련</h2>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ delay()로 센서 블로킹</div>
+      <p><code>delay(1000)</code>은 1초 동안 Arduino를 완전히 멈춥니다. 그 1초 동안 버튼 입력, 시리얼 수신, 다른 센서 읽기가 모두 무시됩니다. 비닐하우스에서 1초 지연도 위험 상황을 놓칠 수 있습니다.</p>
+      <strong>대신:</strong> <code>millis()</code>를 사용한 비블로킹 타이머로 구현하세요.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ loop() 안에 while(true) 중첩</div>
+      <p>Arduino의 <code>loop()</code> 안에 <code>while(true)</code>가 있으면 다른 모든 로직이 실행되지 않습니다. 스테퍼모터 구동 시 특히 주의하세요.</p>
+      <strong>대신:</strong> 스테퍼를 1스텝씩 loop()에서 실행하거나 Stepper 라이브러리를 활용하세요.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ 핀 번호 하드코딩</div>
+      <p>코드 전체에 <code>digitalWrite(5, LOW)</code>처럼 숫자를 직접 쓰면 배선을 변경할 때 코드 전체를 수정해야 합니다. 수정 중 일부를 빠뜨리면 오동작합니다.</p>
+      <strong>대신:</strong> <code>#define PUMP_PIN 5</code> 또는 <code>const int PUMP_PIN = 5;</code>로 맨 위에 선언하세요.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ 센서 이상치(0 / -1 / NaN) 처리 없이 진행</div>
+      <p>센서가 0이나 -1을 돌려줄 때는 읽기 실패입니다. 이 값을 그대로 조건 판단에 쓰면 "토양수분 0% → 펌프 계속 ON" 같은 오동작이 발생할 수 있습니다.</p>
+      <strong>대신:</strong> 이상치를 감지하면 이전 값을 유지하거나 해당 사이클을 건너뛰세요.
+    </div>
+
+    <h2>하드웨어 관련</h2>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ 관수 중 측창 동시 작동</div>
+      <p>펌프가 켜져 있는 상태에서 측창이 열리면 바람으로 인해 물이 전자 부품 방향으로 튀깁니다. 특히 방수 케이스 외부에 부품이 있을 경우 즉시 쇼트가 날 수 있습니다.</p>
+      <strong>대신:</strong> 소프트웨어 인터락으로 관수 중 측창 열기 명령을 차단하세요.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ WiFi 끊겼을 때 로컬 fallback 없는 구조</div>
+      <p>라즈베리파이만 조건 판단을 한다면 WiFi 끊김 = 자동화 정지입니다. 여름 비닐하우스에서 환풍이 멈추면 작물이 손상될 수 있습니다.</p>
+      <strong>대신:</strong> Arduino에 마지막 임계값을 저장해 라즈베리파이 없이도 기본 동작하도록 구현하세요.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ 저항식 토양수분 센서 사용</div>
+      <p>저항식 센서는 토양에 전류를 흘려 수분을 측정합니다. 2~4주 내에 전극이 전기분해로 부식되어 정확도가 급격히 떨어집니다. 농장에서 주기적으로 교체하는 것은 비현실적입니다.</p>
+      <strong>대신:</strong> 캐패시티브 토양수분 센서 v1.2를 사용하세요. 전극이 없어 부식이 없습니다.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ DHT11 사용</div>
+      <p>DHT11은 ±2°C, ±5% RH의 낮은 정밀도를 가집니다. 비닐하우스에서 28°C/30°C/35°C 임계값을 정확히 판단하려면 더 높은 정밀도가 필요합니다.</p>
+      <strong>대신:</strong> DHT22 (±0.5°C, ±2~5% RH)를 사용하세요. 가격 차이는 크지 않습니다.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ 릴레이 전압 미확인 배선</div>
+      <p>12V 환풍팬을 5V 릴레이 모듈에 연결할 때 COM/NO/NC 단자를 반드시 확인하세요. 잘못 연결하면 12V가 Arduino로 역류해 즉시 손상됩니다.</p>
+      <strong>대신:</strong> 배선 전 멀티미터로 전압을 확인하고, COM과 NO 단자에만 연결하세요.
+    </div>
+
+  </div>
+  <div class="page-nav">
+    <a href="09-troubleshoot.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">09. 트러블슈팅</span></a>
+    <a href="11-checklist.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">11. 설치 전 체크리스트</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>

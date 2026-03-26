@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자동화 조건 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">04. 자동화 조건</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">04 / 11</div>
+    <h1>자동화 조건</h1>
+    <p class="desc">관수·환풍·측창·긴급 알림 조건 및 임계값 설정 방법</p>
+  </div>
+  <div class="manual-body">
+
+    <h2>임계값 설정 파일</h2>
+    <p>모든 자동화 조건은 <code>raspberry/config.py</code> 한 파일에서만 수정합니다. 코드를 직접 수정할 필요 없이 이 파일의 숫자만 바꾸면 됩니다.</p>
+    <pre class="code-block"># raspberry/config.py
+
+# ── 관수 설정 ────────────────────────────
+SOIL_DRY_THRESHOLD   = 40    # 토양수분 40% 이하 → 펌프 ON
+PUMP_DURATION_SEC    = 5     # 펌프 작동 시간 (초)
+WATERING_INTERVAL    = 1800  # 관수 후 대기 시간 (초, 30분)
+
+# ── 환풍 설정 ────────────────────────────
+FAN_TEMP_ON          = 28    # 온도 28°C 초과 → 팬 ON
+FAN_TEMP_OFF         = 25    # 온도 25°C 이하 → 팬 OFF (히스테리시스)
+FAN_HUM_ON           = 80    # 습도 80% 초과 → 팬 ON
+
+# ── 측창 설정 ────────────────────────────
+WINDOW_OPEN_TEMP     = 30    # 온도 30°C 초과 → 측창 열기
+WINDOW_CLOSE_TEMP    = 25    # 온도 25°C 이하 → 측창 닫기
+
+# ── 긴급 알림 ────────────────────────────
+ALERT_TEMP           = 35    # 온도 35°C 초과 → 텔레그램 긴급 알림
+ALERT_INTERVAL       = 300   # 알림 반복 간격 (초, 5분) — 스팸 방지
+
+# ── 시리얼 포트 ──────────────────────────
+SERIAL_PORT          = '/dev/ttyUSB0'
+BAUD_RATE            = 9600</pre>
+
+    <h2>관수 (Watering)</h2>
+    <p>토양수분 센서 3개(민트·레몬밤·바질)를 독립적으로 모니터링합니다. 각 화분별로 조건을 판단하고 순차적으로 관수합니다.</p>
+
+    <div class="flow">
+      <div class="flow-item"><span class="flow-num">1</span>A0/A1/A2 → 토양수분 읽기 (0~100%)</div>
+      <div class="flow-item"><span class="flow-num">2</span>40% 이하인 화분 확인</div>
+      <div class="flow-item"><span class="flow-num">3</span>관수 대기 시간(30분) 경과 여부 확인</div>
+      <div class="flow-item"><span class="flow-num">4</span>펌프 5초 ON → OFF</div>
+      <div class="flow-item"><span class="flow-num">5</span>30분 타이머 리셋</div>
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">3개 화분 동시 관수 금지</div>
+      펌프 3개가 동시에 켜지면 전류 과부하로 릴레이가 손상될 수 있습니다. 반드시 순차 관수(화분 1 → 대기 → 화분 2 → 대기 → 화분 3)로 구현해야 합니다.
+    </div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">관수 중 측창 열기 금지</div>
+      펌프가 동작 중일 때 측창이 열리면 바람에 의해 물이 전자 부품 쪽으로 튀어 고장날 수 있습니다. 소프트웨어에서 반드시 인터락(interlock)을 구현해야 합니다.
+    </div>
+
+    <h2>환풍 (Ventilation)</h2>
+    <p>온도 OR 습도 조건이 충족되면 팬이 켜집니다. 단순히 ON/OFF가 아니라 <strong>히스테리시스(hysteresis)</strong> 방식으로 동작합니다.</p>
+
+    <h3>히스테리시스란?</h3>
+    <p>팬 ON 조건(28°C)과 팬 OFF 조건(25°C)을 다르게 설정하는 것입니다. 만약 같은 값이라면 온도가 28.0°C 근처에서 팬이 계속 켜졌다 꺼졌다 하는 <em>채터링</em> 현상이 발생합니다. 히스테리시스로 이를 방지합니다.</p>
+
+    <table class="spec-table">
+      <thead><tr><th>조건</th><th>동작</th></tr></thead>
+      <tbody>
+        <tr><td>온도 > 28°C</td><td>팬 ON</td></tr>
+        <tr><td>습도 > 80%</td><td>팬 ON</td></tr>
+        <tr><td>온도 ≤ 25°C AND 습도 ≤ 70%</td><td>팬 OFF</td></tr>
+      </tbody>
+    </table>
+
+    <h2>측창 (Window)</h2>
+    <p>스테퍼모터(28BYJ-48)로 측창을 열고 닫습니다. 모터가 도달할 수 있는 최대 개방/폐쇄 위치를 소프트웨어에서 스텝 수로 제한합니다.</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">측창 개방 중 관수 금지</div>
+      측창이 열려 있는 상태에서 관수 명령이 들어오면 측창을 먼저 닫고 관수를 시작합니다. 순서: 측창 닫기 완료 확인 → 펌프 ON.
+    </div>
+
+    <h2>긴급 알림</h2>
+    <p>온도가 35°C를 초과하면 텔레그램으로 즉시 알림을 발송합니다. 5분마다 반복 발송합니다 (스팸 방지를 위해 간격 설정).</p>
+    <pre class="code-block"># telegram_bot.py 발송 메시지 예시
+⚠️ SUNAE FARM 긴급 알림
+온도: 37.2°C (임계값 35°C 초과)
+습도: 58%
+시간: 2026-07-15 14:32:11
+→ 즉시 확인이 필요합니다.</pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">텔레그램 봇 설정 방법</div>
+      <ol style="margin-top:.5rem;padding-left:1.25rem">
+        <li>텔레그램에서 @BotFather 검색</li>
+        <li>/newbot 명령 → 봇 이름 설정</li>
+        <li>발급받은 <strong>TOKEN</strong>을 config.py에 입력</li>
+        <li>봇과 대화 후 <strong>CHAT_ID</strong>를 config.py에 입력</li>
+      </ol>
+    </div>
+
+  </div>
+  <div class="page-nav">
+    <a href="03-modes.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">03. 동작 모드</span></a>
+    <a href="05-pinmap.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">05. 핀맵</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>

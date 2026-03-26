@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시스템 구조 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">🌿</span>
+      <div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div>
+    </div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">02. 시스템 구조</span>
+  </div>
+
+  <div class="manual-header">
+    <div class="label">02 / 11</div>
+    <h1>시스템 구조</h1>
+    <p class="desc">라즈베리파이 + Arduino 이중 구조 설계 이유와 통신 방식</p>
+  </div>
+
+  <div class="manual-body">
+
+    <h2>전체 아키텍처</h2>
+    <pre class="code-block">[ 스마트폰 / 외부 PC ]
+        ↓  SSH (ngrok 터널) / 웹 대시보드
+[ 라즈베리파이 4B ]  ← 두뇌
+  ├─ Python 자동화 로직 (main.py)
+  ├─ 웹 대시보드 서버 (dashboard.py / Flask)
+  ├─ 텔레그램 봇 (telegram_bot.py)
+  └─ GitHub pull → 코드 배포
+        ↓  USB 시리얼 통신 (9600bps)
+[ Arduino Uno ]  ← 근육
+  ├─ 센서 직접 읽기 (토양수분·온습도·조도)
+  ├─ 릴레이 제어 (펌프·팬)
+  ├─ 스테퍼모터 제어 (측창 개폐)
+  └─ 물리 버튼 입력 처리 (MANUAL 모드)</pre>
+
+    <h2>왜 라즈베리파이 + Arduino 이중 구조인가</h2>
+    <p>Arduino만으로도 센서를 읽고 릴레이를 제어할 수 있습니다. 하지만 이 프로젝트에서는 두 가지를 함께 사용합니다. 이유는 다음과 같습니다.</p>
+
+    <table class="spec-table">
+      <thead><tr><th>역할</th><th>Arduino 단독</th><th>라즈베리파이 + Arduino</th></tr></thead>
+      <tbody>
+        <tr><td>웹 서버</td><td>불가 (메모리 부족)</td><td>Flask로 풀 웹 대시보드 가능</td></tr>
+        <tr><td>텔레그램 봇</td><td>불가</td><td>python-telegram-bot 사용 가능</td></tr>
+        <tr><td>코드 원격 배포</td><td>불가</td><td>git pull 한 줄로 배포</td></tr>
+        <tr><td>복잡한 로직</td><td>제한적 (C/C++, 메모리 2KB)</td><td>Python으로 자유롭게 구현</td></tr>
+        <tr><td>WiFi 없을 때 동작</td><td>가능</td><td>Arduino가 독립 fallback 담당</td></tr>
+        <tr><td>센서 직접 제어</td><td>최적 (실시간, 지연 없음)</td><td>Arduino가 담당 (라즈베리파이 GPIO 사용 안 함)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-info">
+      <div class="callout-title">왜 라즈베리파이 GPIO를 쓰지 않는가</div>
+      라즈베리파이의 GPIO 핀으로도 센서를 읽을 수 있습니다. 하지만 Linux 운영체제가 실행 중이기 때문에 실시간 타이밍이 보장되지 않습니다. DHT22 같은 센서는 정밀한 타이밍이 필요하므로 Arduino가 훨씬 안정적입니다.
+    </div>
+
+    <h2>통신 방식 — USB 시리얼</h2>
+    <p>라즈베리파이와 Arduino는 USB 케이블로 연결하고, <strong>시리얼 통신(9600bps)</strong>으로 데이터를 주고받습니다.</p>
+
+    <h3>Arduino → 라즈베리파이 (센서 데이터 전송)</h3>
+    <pre class="code-block">// Arduino가 1초마다 전송하는 데이터 형식
+SOIL:45,62,38|TEMP:27.3|HUM:65.2|LUX:842|MODE:AUTO</pre>
+
+    <h3>라즈베리파이 → Arduino (제어 명령 전송)</h3>
+    <pre class="code-block"># 라즈베리파이가 보내는 명령 형식
+PUMP:ON      # 펌프 켜기
+PUMP:OFF     # 펌프 끄기
+FAN:ON       # 팬 켜기
+FAN:OFF      # 팬 끄기
+WINDOW:OPEN  # 측창 열기
+WINDOW:CLOSE # 측창 닫기</pre>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">포트 확인 필수</div>
+      라즈베리파이에서 Arduino 포트는 <code>/dev/ttyUSB0</code> 또는 <code>/dev/ttyACM0</code>입니다. 연결 후 <code>ls /dev/tty*</code>로 먼저 확인하세요.
+    </div>
+
+    <h2>소프트웨어 파일 구조</h2>
+    <pre class="code-block">sunaefarm/
+├── arduino/
+│   └── sunae_farm.ino      ← Arduino 코드 (센서·릴레이·버튼)
+├── raspberry/
+│   ├── main.py             ← 자동화 메인 루프 (조건 판단·명령 전송)
+│   ├── dashboard.py        ← Flask 웹 대시보드
+│   ├── telegram_bot.py     ← 텔레그램 긴급 알림
+│   └── config.py           ← 임계값 설정 (여기서만 수정)
+├── wokwi/
+│   └── diagram.json        ← 회로 시뮬레이터
+└── README.md</pre>
+
+    <h2>데이터 흐름</h2>
+    <div class="flow">
+      <div class="flow-item"><span class="flow-num">1</span>Arduino가 센서값 읽기 (1초 주기)</div>
+      <div class="flow-item"><span class="flow-num">2</span>시리얼로 라즈베리파이에 전송</div>
+      <div class="flow-item"><span class="flow-num">3</span>main.py가 config.py 임계값과 비교·판단</div>
+      <div class="flow-item"><span class="flow-num">4</span>조건 충족 시 제어 명령 시리얼로 전송</div>
+      <div class="flow-item"><span class="flow-num">5</span>Arduino가 명령 받아 릴레이·모터 제어</div>
+      <div class="flow-item"><span class="flow-num">6</span>결과를 웹 대시보드에 실시간 표시</div>
+      <div class="flow-item"><span class="flow-num">7</span>임계값 초과 시 텔레그램 긴급 알림 발송</div>
+    </div>
+
+  </div>
+
+  <div class="page-nav">
+    <a href="01-overview.html" class="prev">
+      <span class="nav-dir">← 이전</span>
+      <span class="nav-title">01. 프로젝트 개요</span>
+    </a>
+    <a href="03-modes.html" class="next">
+      <span class="nav-dir">다음 →</span>
+      <span class="nav-title">03. 동작 모드</span>
+    </a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+</body>
+</html>

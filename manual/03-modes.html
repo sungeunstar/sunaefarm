@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동작 모드 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">03. 동작 모드</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">03 / 11</div>
+    <h1>동작 모드</h1>
+    <p class="desc">AUTO / REMOTE / MANUAL 3단계 모드 전환 원리와 동작 방식</p>
+  </div>
+  <div class="manual-body">
+
+    <h2>3가지 모드 개요</h2>
+    <table class="spec-table">
+      <thead><tr><th>모드</th><th>전환 방법</th><th>누가 제어하는가</th><th>라즈베리파이 역할</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-green">AUTO</span></td>
+          <td>토글 스위치 → AUTO 위치</td>
+          <td>센서값 기반 자동 판단</td>
+          <td>main.py가 조건 판단 후 명령 전송</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">REMOTE</span></td>
+          <td>웹 대시보드에서 명령 버튼 클릭</td>
+          <td>사람 (원격 수동)</td>
+          <td>대시보드 명령을 Arduino에 전달</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-yellow">MANUAL</span></td>
+          <td>토글 스위치 → MANUAL 위치</td>
+          <td>사람 (현장 버튼)</td>
+          <td>명령 무시됨 — Arduino가 독립 동작</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>AUTO 모드</h2>
+    <p>가장 기본 모드입니다. 토글 스위치가 AUTO 위치에 있을 때 활성화됩니다. Arduino가 센서 데이터를 1초마다 라즈베리파이에 전송하고, main.py가 config.py의 임계값과 비교해 제어 명령을 내립니다.</p>
+    <div class="flow">
+      <div class="flow-item"><span class="flow-num">1</span>토글 스위치 D12 → HIGH 신호 (AUTO)</div>
+      <div class="flow-item"><span class="flow-num">2</span>Arduino → 센서값 시리얼 전송 (1초 주기)</div>
+      <div class="flow-item"><span class="flow-num">3</span>main.py → 임계값 비교 판단</div>
+      <div class="flow-item"><span class="flow-num">4</span>조건 충족 시 명령 전송 (PUMP:ON 등)</div>
+      <div class="flow-item"><span class="flow-num">5</span>Arduino → 릴레이·모터 제어 실행</div>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title">안전 인터락</div>
+      관수(펌프 ON) 중에는 측창 열기 명령이 들어와도 실행되지 않습니다. 물 튀김으로 인한 전자 부품 손상을 방지하는 SAFE-SEQUENCE 규칙입니다.
+    </div>
+
+    <h2>REMOTE 모드</h2>
+    <p>웹 대시보드에서 버튼을 클릭하면 라즈베리파이가 Arduino에 즉시 명령을 보냅니다. 명령 실행 후 일정 시간이 지나면 자동으로 AUTO 모드로 복귀합니다.</p>
+    <div class="callout callout-warn">
+      <div class="callout-title">REMOTE는 AUTO의 일시적 오버라이드입니다</div>
+      토글 스위치는 AUTO 위치를 유지한 상태에서 웹으로 명령을 내리는 것입니다. 명령 후 AUTO 로직이 다시 작동합니다. MANUAL처럼 완전히 수동으로 넘어가는 것이 아닙니다.
+    </div>
+    <p>접속 방법은 <a href="08-remote.html">08. 원격 접속</a>을 참고하세요.</p>
+
+    <h2>MANUAL 모드</h2>
+    <p>현장의 물리 버튼으로 직접 제어합니다. <strong>토글 스위치를 MANUAL 위치로 내리면 Arduino가 라즈베리파이의 명령을 완전히 무시합니다.</strong> WiFi가 없거나 라즈베리파이에 문제가 생겼을 때 현장에서 직접 대응하는 비상 수단입니다.</p>
+
+    <h3>현장 버튼 배정</h3>
+    <table class="spec-table">
+      <thead><tr><th>버튼</th><th>핀</th><th>기능</th></tr></thead>
+      <tbody>
+        <tr><td>버튼 1</td><td>A3</td><td>펌프 ON/OFF 토글</td></tr>
+        <tr><td>버튼 2</td><td>A4</td><td>환풍팬 ON/OFF 토글</td></tr>
+        <tr><td>버튼 3</td><td>A5</td><td>측창 열기/닫기 토글</td></tr>
+      </tbody>
+    </table>
+
+    <h2>LED 상태 표시</h2>
+    <p>현재 모드를 LED로 확인할 수 있습니다.</p>
+    <table class="spec-table">
+      <thead><tr><th>LED 색</th><th>의미</th></tr></thead>
+      <tbody>
+        <tr><td>녹색 점등</td><td>AUTO 모드 동작 중</td></tr>
+        <tr><td>청색 점등</td><td>REMOTE 명령 실행 중</td></tr>
+        <tr><td>황색 점등</td><td>MANUAL 모드 (라즈베리파이 명령 무시 중)</td></tr>
+        <tr><td>적색 점멸</td><td>긴급 상황 (온도 35°C 초과)</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="page-nav">
+    <a href="02-architecture.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">02. 시스템 구조</span></a>
+    <a href="04-automation.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">04. 자동화 조건</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>

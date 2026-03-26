@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>코드 배포 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">07. 코드 배포</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">07 / 11</div>
+    <h1>코드 배포</h1>
+    <p class="desc">GitHub → git pull → Arduino 업로드 배포 파이프라인</p>
+  </div>
+  <div class="manual-body">
+
+    <h2>배포 파이프라인</h2>
+    <div class="flow">
+      <div class="flow-item"><span class="flow-num">1</span>PC에서 코드 수정</div>
+      <div class="flow-item"><span class="flow-num">2</span><code>git add . && git commit -m "변경 내용"</code></div>
+      <div class="flow-item"><span class="flow-num">3</span><code>git push origin main</code> → GitHub 반영</div>
+      <div class="flow-item"><span class="flow-num">4</span>라즈베리파이에서 <code>git pull</code></div>
+      <div class="flow-item"><span class="flow-num">5</span>Arduino 코드도 변경된 경우 arduino-cli로 업로드</div>
+      <div class="flow-item"><span class="flow-num">6</span>서비스 재시작 → 새 코드 반영 완료</div>
+    </div>
+
+    <h2>Python 코드만 변경된 경우</h2>
+    <pre class="code-block"># 라즈베리파이에서 (SSH 접속 후)
+cd ~/sunaefarm
+git pull
+sudo systemctl restart sunae-farm
+sudo systemctl status sunae-farm   # 재시작 확인</pre>
+
+    <h2>Arduino 코드도 변경된 경우</h2>
+    <pre class="code-block">cd ~/sunaefarm
+git pull
+
+# Arduino 코드 재업로드
+arduino-cli compile --fqbn arduino:avr:uno arduino/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno arduino/
+
+# Python 서비스 재시작
+sudo systemctl restart sunae-farm</pre>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">Arduino 업로드 중 서비스 중지 필요</div>
+      arduino-cli가 시리얼 포트를 사용하는 동안 main.py도 같은 포트를 사용하면 충돌합니다. 업로드 전에 서비스를 잠시 중지하세요.
+      <pre style="margin-top:.5rem;background:#1a1f1c;color:#c8d8cc;padding:.75rem;border-radius:6px;font-size:.8rem">sudo systemctl stop sunae-farm
+arduino-cli upload ...
+sudo systemctl start sunae-farm</pre>
+    </div>
+
+    <h2>배포 로그 확인</h2>
+    <pre class="code-block"># 실시간 로그 확인
+sudo journalctl -u sunae-farm -f
+
+# 최근 50줄
+sudo journalctl -u sunae-farm -n 50</pre>
+
+    <h2>git 충돌 해결</h2>
+    <pre class="code-block"># config.py 같은 파일을 라즈베리파이에서 수정했다면 충돌 발생 가능
+# 라즈베리파이 버전을 버리고 GitHub 버전으로 덮어쓸 때:
+git fetch origin
+git reset --hard origin/main</pre>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">reset --hard 는 로컬 변경을 모두 삭제합니다</div>
+      라즈베리파이에서 직접 수정한 내용이 있다면 reset 전에 백업하세요.
+    </div>
+
+  </div>
+  <div class="page-nav">
+    <a href="06-setup.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">06. 설치 방법</span></a>
+    <a href="08-remote.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">08. 원격 접속</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>

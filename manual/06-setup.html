@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>설치 방법 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">06. 설치 방법</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">06 / 11</div>
+    <h1>설치 방법</h1>
+    <p class="desc">라즈베리파이 OS 설치부터 첫 실행까지 단계별 가이드</p>
+  </div>
+  <div class="manual-body">
+
+    <div class="callout callout-warn">
+      <div class="callout-title">집에서 먼저 완전히 테스트하세요</div>
+      현장(비닐하우스)에서 디버깅하는 것은 집에서보다 2배 이상 어렵습니다. 모든 기능이 집에서 동작 확인된 후에만 하우스로 이동합니다.
+    </div>
+
+    <h2>STEP 1 — 라즈베리파이 OS 설치</h2>
+    <ol class="step-list">
+      <li><strong>Raspberry Pi Imager 다운로드</strong><br>공식 사이트(raspberrypi.com)에서 Raspberry Pi Imager를 PC에 설치합니다.</li>
+      <li><strong>OS 선택</strong><br>Raspberry Pi OS Lite (64-bit) 권장. 데스크탑 UI 불필요 — 용량과 메모리를 절약합니다.</li>
+      <li><strong>고급 설정 (중요)</strong><br>Imager에서 ⚙️ 아이콘 클릭 후:<br>
+        <ul>
+          <li>호스트명: <code>sunaefarm</code></li>
+          <li>SSH 활성화: ✅</li>
+          <li>WiFi 설정: SSID / 비밀번호 입력</li>
+          <li>사용자 이름: <code>pi</code> / 비밀번호 설정</li>
+        </ul>
+      </li>
+      <li><strong>MicroSD에 쓰기</strong><br>32GB 이상 MicroSD (Samsung U3 권장) 삽입 후 Write 클릭.</li>
+      <li><strong>라즈베리파이 부팅</strong><br>SD카드 삽입 → 전원 연결. 최초 부팅은 2~3분 소요됩니다.</li>
+    </ol>
+
+    <h2>STEP 2 — SSH 접속</h2>
+    <pre class="code-block"># 같은 WiFi 네트워크에서
+ssh pi@sunaefarm.local
+
+# IP 주소로 접속할 경우 (공유기 관리자 페이지에서 IP 확인)
+ssh pi@192.168.x.x</pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">처음 접속 시 fingerprint 경고가 나타납니다</div>
+      <code>Are you sure you want to continue connecting? (yes/no)</code> → <code>yes</code> 입력
+    </div>
+
+    <h2>STEP 3 — 시스템 업데이트 및 의존성 설치</h2>
+    <pre class="code-block"># 시스템 업데이트
+sudo apt update && sudo apt upgrade -y
+
+# Python 패키지 설치
+pip3 install pyserial flask python-telegram-bot --break-system-packages
+
+# arduino-cli 설치
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+sudo mv ~/bin/arduino-cli /usr/local/bin/
+
+# arduino-cli 초기 설정
+arduino-cli config init
+arduino-cli core update-index
+arduino-cli core install arduino:avr</pre>
+
+    <h2>STEP 4 — 코드 다운로드</h2>
+    <pre class="code-block">cd ~
+git clone https://github.com/sungeunstar/sunaefarm.git
+cd sunaefarm</pre>
+
+    <h2>STEP 5 — Arduino 코드 업로드</h2>
+    <pre class="code-block"># USB로 Arduino 연결 후 포트 확인
+ls /dev/ttyUSB*
+# 또는
+ls /dev/ttyACM*
+
+# 컴파일 + 업로드 (포트 번호를 확인한 것으로 대체)
+arduino-cli compile --fqbn arduino:avr:uno arduino/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno arduino/</pre>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">포트가 보이지 않는 경우</div>
+      Arduino를 USB로 연결하고 <code>dmesg | tail -20</code>을 실행하면 연결된 포트명을 확인할 수 있습니다.
+    </div>
+
+    <h2>STEP 6 — config.py 설정</h2>
+    <pre class="code-block">nano raspberry/config.py</pre>
+    <p>텔레그램 봇 TOKEN과 CHAT_ID를 입력합니다. 임계값은 초기값으로 시작하고 나중에 조정합니다.</p>
+
+    <h2>STEP 7 — 첫 실행 및 테스트</h2>
+    <pre class="code-block"># 자동화 메인 실행 (터미널에서 직접 테스트)
+python3 raspberry/main.py
+
+# 별도 터미널에서 웹 대시보드 실행
+python3 raspberry/dashboard.py</pre>
+    <p>브라우저에서 <code>http://sunaefarm.local:5000</code> 접속해 대시보드가 보이면 성공입니다.</p>
+
+    <h2>STEP 8 — systemd 서비스 등록 (자동 시작)</h2>
+    <pre class="code-block">sudo nano /etc/systemd/system/sunae-farm.service</pre>
+    <pre class="code-block">[Unit]
+Description=SUNAE FARM Automation
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/sunaefarm/raspberry/main.py
+WorkingDirectory=/home/pi/sunaefarm
+User=pi
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</pre>
+    <pre class="code-block">sudo systemctl enable sunae-farm
+sudo systemctl start sunae-farm
+sudo systemctl status sunae-farm  # 동작 확인</pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">서비스 등록 후 자동 시작됩니다</div>
+      라즈베리파이가 재부팅되거나 프로그램이 충돌해도 자동으로 재시작됩니다.
+    </div>
+
+  </div>
+  <div class="page-nav">
+    <a href="05-pinmap.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">05. 핀맵</span></a>
+    <a href="07-deploy.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">07. 코드 배포</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>

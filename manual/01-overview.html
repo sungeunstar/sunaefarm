@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로젝트 개요 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-mark">🌿</span>
+      <div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div>
+    </div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">01. 프로젝트 개요</span>
+  </div>
+
+  <div class="manual-header">
+    <div class="label">01 / 11</div>
+    <h1>프로젝트 개요</h1>
+    <p class="desc">이 시스템이 무엇인지, 왜 만들었는지, 핵심 기능 요약</p>
+  </div>
+
+  <div class="manual-body">
+
+    <h2>무엇을 만드는가</h2>
+    <p>SUNAE FARM은 친구의 비닐하우스에 설치할 <strong>스마트팜 자동화 프로토타입</strong>입니다. 기존에는 사람이 직접 하루에 여러 번 화분 상태를 확인하고 물을 주고, 온도가 오르면 창문을 열고, 팬을 켜야 했습니다. 이 시스템은 그 반복 작업을 자동화하면서도, 필요할 때는 스마트폰이나 현장 버튼으로 직접 제어할 수 있게 설계되었습니다.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">FARMOB이란?</div>
+      FARM + TOMOB의 합성어입니다. SUNAE FARM 프로젝트의 시스템 코드명으로, 하드웨어·소프트웨어 시스템 전체를 가리킵니다.
+    </div>
+
+    <h2>핵심 기능</h2>
+    <table class="spec-table">
+      <thead><tr><th>기능</th><th>동작 조건</th><th>담당 부품</th></tr></thead>
+      <tbody>
+        <tr><td>자동 관수</td><td>토양수분 40% 이하 감지 시 펌프 5초 ON, 30분 대기</td><td>토양수분 센서 × 3, 수중 펌프, 릴레이</td></tr>
+        <tr><td>환풍 제어</td><td>온도 28°C 초과 또는 습도 80% 초과 시 팬 ON</td><td>DHT22, 환풍팬 × 2, 릴레이</td></tr>
+        <tr><td>측창 개폐</td><td>온도 30°C 초과 시 열기 / 25°C 이하 시 닫기</td><td>DHT22, 28BYJ-48 스테퍼모터, ULN2003</td></tr>
+        <tr><td>긴급 알림</td><td>온도 35°C 초과 시 텔레그램 메시지 발송</td><td>라즈베리파이, 텔레그램 봇</td></tr>
+        <tr><td>원격 제어</td><td>언제 어디서나 웹 대시보드로 수동 명령</td><td>라즈베리파이, Flask, ngrok</td></tr>
+        <tr><td>현장 수동 제어</td><td>버튼으로 직접 제어 (WiFi 없어도 동작)</td><td>Arduino, 푸시버튼 × 3, 토글 스위치</td></tr>
+      </tbody>
+    </table>
+
+    <h2>설계 목표</h2>
+
+    <h3>1. 비닐하우스 환경에 최적화</h3>
+    <p>비닐하우스는 여름에 내부 온도가 40°C를 넘기도 합니다. 방수가 되지 않는 장비는 습도와 물에 의해 고장납니다. 모든 전자 부품은 방수 인클로저에 수납하고, 센서는 내부식성 캐패시티브 방식을 사용합니다.</p>
+
+    <h3>2. 인터넷 없이도 동작</h3>
+    <p>농장은 WiFi가 불안정할 수 있습니다. WiFi가 끊어지더라도 Arduino 단독으로 기본 동작(관수·환풍·측창)을 유지할 수 있는 Fallback 로직을 설계합니다. 라즈베리파이는 네트워크 복구 후 자동으로 재연결됩니다.</p>
+
+    <h3>3. 집에서 개발, 현장에서 설치</h3>
+    <p>모든 코드는 GitHub으로 관리하고, 라즈베리파이에서 <code>git pull</code> 하면 최신 코드가 배포됩니다. 집에서 100% 동작 확인 후 하우스로 이동합니다. 현장 디버깅은 2배로 어렵습니다.</p>
+
+    <h3>4. 3단계 모드로 유연한 제어</h3>
+    <p>AUTO(자동)·REMOTE(원격)·MANUAL(현장 버튼) 3가지 모드를 물리 토글 스위치로 전환합니다. 어떤 상황에서도 사람이 개입할 수 있습니다.</p>
+
+    <h2>하드웨어 구성 요약</h2>
+    <div class="two-col">
+      <div>
+        <h3>두뇌 — 라즈베리파이 4B</h3>
+        <ul>
+          <li>Python 자동화 로직 실행</li>
+          <li>Flask 웹 대시보드 서버</li>
+          <li>텔레그램 봇 알림</li>
+          <li>GitHub에서 코드 pull·배포</li>
+          <li>ngrok 외부 접속 터널</li>
+        </ul>
+      </div>
+      <div>
+        <h3>근육 — Arduino Uno</h3>
+        <ul>
+          <li>센서 직접 읽기 (아날로그·디지털)</li>
+          <li>릴레이 ON/OFF 제어</li>
+          <li>스테퍼모터 제어 (측창)</li>
+          <li>물리 버튼 입력 처리</li>
+          <li>WiFi 없어도 독립 동작 가능</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>예상 총 비용</h2>
+    <p>전체 부품 구매 예산은 약 <strong>₩158,200 ~ ₩255,000</strong>입니다. 자세한 항목은 <a href="../shopping.html">구매 리스트</a>에서 확인할 수 있습니다.</p>
+
+  </div>
+
+  <div class="page-nav">
+    <span></span>
+    <a href="02-architecture.html" class="next">
+      <span class="nav-dir">다음 →</span>
+      <span class="nav-title">02. 시스템 구조</span>
+    </a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

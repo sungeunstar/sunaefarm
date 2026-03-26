@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>핀맵 — 설명서 — SUNAE FARM</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/manual.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span class="logo-mark">🌿</span><div><span class="logo-title">SUNAE FARM</span><span class="logo-sub">FARMOB v1</span></div></div>
+    <nav class="site-nav">
+      <a href="../index.html" class="nav-link">홈</a>
+      <a href="../manual.html" class="nav-link active">설명서</a>
+      <a href="../shopping.html" class="nav-link">구매 리스트</a>
+      <a href="../circuit.html" class="nav-link">회로 설계</a>
+      <a href="../progress.html" class="nav-link">작업 진행</a>
+    </nav>
+  </div>
+</header>
+<main class="container">
+  <div class="breadcrumb">
+    <a href="../index.html">홈</a><span class="sep">›</span>
+    <a href="../manual.html">설명서</a><span class="sep">›</span>
+    <span class="current">05. 핀맵</span>
+  </div>
+  <div class="manual-header">
+    <div class="label">05 / 11</div>
+    <h1>핀맵</h1>
+    <p class="desc">Arduino Uno 전체 핀 배정, 배선 원칙, 주의사항</p>
+  </div>
+  <div class="manual-body">
+
+    <h2>전체 핀 배정표</h2>
+    <table class="spec-table">
+      <thead><tr><th>핀</th><th>연결 부품</th><th>방향</th><th>주의사항</th></tr></thead>
+      <tbody>
+        <tr><td>A0</td><td>토양수분 센서 1 (민트)</td><td>INPUT (아날로그)</td><td>캐패시티브 v1.2만 사용</td></tr>
+        <tr><td>A1</td><td>토양수분 센서 2 (레몬밤)</td><td>INPUT (아날로그)</td><td>캐패시티브 v1.2만 사용</td></tr>
+        <tr><td>A2</td><td>토양수분 센서 3 (바질)</td><td>INPUT (아날로그)</td><td>캐패시티브 v1.2만 사용</td></tr>
+        <tr><td>A3</td><td>푸시버튼 1 (펌프 수동)</td><td>INPUT_PULLUP</td><td>GND로 연결, 내부 풀업 사용</td></tr>
+        <tr><td>A4</td><td>푸시버튼 2 (팬 수동)</td><td>INPUT_PULLUP</td><td>GND로 연결, 내부 풀업 사용</td></tr>
+        <tr><td>A5</td><td>푸시버튼 3 (측창 수동)</td><td>INPUT_PULLUP</td><td>GND로 연결, 내부 풀업 사용</td></tr>
+        <tr><td>D2</td><td>DHT22 DATA</td><td>INPUT</td><td><strong>10kΩ 풀업저항 필수</strong> (DATA-VCC 사이)</td></tr>
+        <tr><td>D3</td><td>BH1750 SDA</td><td>I/O (소프트 I2C)</td><td>SoftwareWire 라이브러리 사용</td></tr>
+        <tr><td>D4</td><td>BH1750 SCL</td><td>I/O (소프트 I2C)</td><td>SoftwareWire 라이브러리 사용</td></tr>
+        <tr><td>D5</td><td>릴레이 CH1 (펌프)</td><td>OUTPUT</td><td>LOW = ON (릴레이 모듈 특성)</td></tr>
+        <tr><td>D6</td><td>릴레이 CH2 (환풍팬)</td><td>OUTPUT</td><td>LOW = ON (릴레이 모듈 특성)</td></tr>
+        <tr><td>D8</td><td>ULN2003 IN1 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
+        <tr><td>D9</td><td>ULN2003 IN2 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
+        <tr><td>D10</td><td>ULN2003 IN3 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
+        <tr><td>D11</td><td>ULN2003 IN4 (스테퍼)</td><td>OUTPUT</td><td>측창 개폐용</td></tr>
+        <tr><td>D12</td><td>토글 스위치 (AUTO/MANUAL)</td><td>INPUT_PULLUP</td><td>HIGH = AUTO, LOW = MANUAL</td></tr>
+      </tbody>
+    </table>
+
+    <h2>전원 핀</h2>
+    <table class="spec-table">
+      <thead><tr><th>핀</th><th>용도</th><th>최대 전류</th></tr></thead>
+      <tbody>
+        <tr><td>5V</td><td>DHT22, BH1750, 토양수분 센서, 릴레이 VCC, ULN2003 COM</td><td>500mA (USB 공급 시)</td></tr>
+        <tr><td>3.3V</td><td>사용 안 함</td><td>—</td></tr>
+        <tr><td>GND</td><td>모든 부품 공통 접지</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">5V 핀 전류 주의</div>
+      Arduino Uno의 5V 핀은 USB 공급 시 약 500mA까지만 안전하게 사용할 수 있습니다. 환풍팬(12V DC)은 반드시 외부 12V 어댑터로 별도 공급해야 합니다. 팬을 5V Arduino 핀으로 구동하면 Arduino가 리셋되거나 손상됩니다.
+    </div>
+
+    <h2>DHT22 배선 상세</h2>
+    <pre class="code-block">DHT22 핀 1 (VCC)  ──────────────── Arduino 5V
+DHT22 핀 2 (DATA) ──┬─────────── Arduino D2
+                    └── 10kΩ ── Arduino 5V  ← 풀업저항
+DHT22 핀 3 (NC)   ── (연결 안 함)
+DHT22 핀 4 (GND)  ──────────────── Arduino GND</pre>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">10kΩ 풀업저항 없으면 DHT22가 동작하지 않습니다</div>
+      DATA 핀과 VCC 사이에 10kΩ 저항을 반드시 연결해야 합니다. 없으면 센서 값이 -1 또는 NaN으로 읽힙니다.
+    </div>
+
+    <h2>릴레이 모듈 배선 상세</h2>
+    <pre class="code-block">릴레이 모듈 VCC ──── Arduino 5V
+릴레이 모듈 GND ──── Arduino GND
+릴레이 CH1 IN  ──── Arduino D5  (LOW = 펌프 ON)
+릴레이 CH2 IN  ──── Arduino D6  (LOW = 팬 ON)
+
+릴레이 CH1 COM ──── 펌프 전원 +
+릴레이 CH1 NO  ──── 펌프 +극   (Normally Open)
+
+릴레이 CH2 COM ──── 12V 어댑터 +
+릴레이 CH2 NO  ──── 팬 +극     (Normally Open)</pre>
+
+    <div class="callout callout-info">
+      <div class="callout-title">릴레이는 LOW 신호로 켜집니다</div>
+      일반적인 5V 릴레이 모듈은 IN 핀에 LOW(0V) 신호가 오면 릴레이가 ON됩니다. Arduino 코드에서 <code>digitalWrite(RELAY_PIN, LOW)</code> = 켜기, <code>HIGH</code> = 끄기임을 주의하세요.
+    </div>
+
+    <h2>ULN2003 + 28BYJ-48 배선</h2>
+    <pre class="code-block">ULN2003 IN1 ──── Arduino D8
+ULN2003 IN2 ──── Arduino D9
+ULN2003 IN3 ──── Arduino D10
+ULN2003 IN4 ──── Arduino D11
+ULN2003 COM ──── Arduino 5V
+ULN2003 OUT1~4 ─ 28BYJ-48 커넥터 (세트 구매 시 자동 연결)</pre>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">스테퍼모터 Arduino 직결 금지</div>
+      28BYJ-48 스테퍼모터를 Arduino 핀에 직접 연결하면 Arduino가 손상됩니다. 반드시 ULN2003 드라이버 보드를 경유해야 합니다.
+    </div>
+
+    <p>시각적 회로도는 <a href="../circuit.html">회로 설계</a> 페이지에서 Wokwi로 확인할 수 있습니다.</p>
+
+  </div>
+  <div class="page-nav">
+    <a href="04-automation.html" class="prev"><span class="nav-dir">← 이전</span><span class="nav-title">04. 자동화 조건</span></a>
+    <a href="06-setup.html" class="next"><span class="nav-dir">다음 →</span><span class="nav-title">06. 설치 방법</span></a>
+  </div>
+</main>
+<footer class="site-footer"><div class="container"><p>SUNAE FARM · FARMOB v1 · 2026 · <a href="https://github.com/sungeunstar/sunaefarm" target="_blank">GitHub</a></p></div></footer>
+</body>
+</html>
